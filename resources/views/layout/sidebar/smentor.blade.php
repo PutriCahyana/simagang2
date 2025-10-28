@@ -49,6 +49,12 @@
                        <span>Peserta</span></a>
                </li>
 
+               <li class="nav-item {{ $menuMentorPeserta ?? '' }}">
+                   <a class="nav-link" href="{{ route('mentor.logbook.index') }}">
+                       <i class="fas fa-fw fa-table"></i>
+                       <span>Logbook</span></a>
+               </li>
+
 
 
             <!-- Sidebar Toggler (Sidebar) -->

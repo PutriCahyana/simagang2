@@ -42,24 +42,26 @@ class MateriController extends Controller
         return view('peserta.materials.index', compact('generalMaterials', 'joinedRooms'));
     }
 
-    public function view($id)
-    {
-        $user = Auth::user();
-        $peserta = Peserta::where('peserta_id', $user->id)->first();
-        $materi = Materi::with('room')->findOrFail($id);
+   public function view($id)
+{
+    $user = Auth::user();
+    $peserta = Peserta::where('peserta_id', $user->id)->first();
+    
+    // Tambahkan 'room.materis' untuk load materi lain dari room yang sama
+    $materi = Materi::with(['room.materis'])->findOrFail($id);
 
-        if (strtolower($materi->room->nama_room) !== 'general') {
-            $hasAccess = $materi->room->peserta()
-                ->where('users.id', $peserta->peserta_id)
-                ->exists();
+    if (strtolower($materi->room->nama_room) !== 'general') {
+        $hasAccess = $materi->room->peserta()
+            ->where('users.id', $peserta->peserta_id)
+            ->exists();
 
-            if (!$hasAccess) {
-                abort(403, 'Anda tidak memiliki akses ke materi ini. Silakan join room terlebih dahulu.');
-            }
+        if (!$hasAccess) {
+            abort(403, 'Anda tidak memiliki akses ke materi ini. Silakan join room terlebih dahulu.');
         }
-
-        return view('peserta.materials.view', compact('materi'));
     }
+
+    return view('peserta.materials.view', compact('materi'));
+}
 
     public function download($id)
     {
@@ -87,5 +89,55 @@ class MateriController extends Controller
         }
 
         return Storage::download($filePath, $materi->judul . '.pdf');
+    }
+
+        public function viewPdf($id)
+    {
+        $user = Auth::user();
+        $peserta = Peserta::where('peserta_id', $user->id)->first();
+        $materi = Materi::with('room')->findOrFail($id);
+
+        if (strtolower($materi->room->nama_room) !== 'general') {
+            $hasAccess = $materi->room->peserta()
+                ->where('users.id', $peserta->peserta_id)
+                ->exists();
+
+            if (!$hasAccess) {
+                abort(403, 'Anda tidak memiliki akses ke materi ini.');
+            }
+        }
+
+        $filePath = 'materi/' . $materi->konten;
+        if (!Storage::exists($filePath)) {
+            abort(404, 'File PDF tidak ditemukan.');
+        }
+
+        return response()->file(Storage::path($filePath));
+    }
+
+    public function stream($id)
+    {
+        $user = Auth::user();
+        $peserta = Peserta::where('peserta_id', $user->id)->first();
+        $materi = Materi::with('room')->findOrFail($id);
+
+        if (strtolower($materi->room->nama_room) !== 'general') {
+            $hasAccess = $materi->room->peserta()
+                ->where('users.id', $peserta->peserta_id)
+                ->exists();
+
+            if (!$hasAccess) {
+                abort(403, 'Anda tidak memiliki akses ke materi ini.');
+            }
+        }
+
+        $filePath = 'materi/' . $materi->konten;
+        if (!Storage::exists($filePath)) {
+            abort(404, 'File video tidak ditemukan.');
+        }
+
+        return response()->file(Storage::path($filePath), [
+            'Content-Type' => 'video/mp4',
+        ]);
     }
 }

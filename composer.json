@@ -8,7 +8,11 @@
     "require": {
         "php": "^8.2",
         "laravel/framework": "^12.0",
-        "laravel/tinker": "^2.10.1"
+        "laravel/tinker": "^2.10.1",
+        "maatwebsite/excel": "^1.1",
+        "phenx/php-font-lib": "0.5",
+        "phpoffice/phpspreadsheet": "^5.0",
+        "spatie/laravel-pdf": "^1.8"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",

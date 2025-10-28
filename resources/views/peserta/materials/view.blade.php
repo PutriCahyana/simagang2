@@ -3,24 +3,14 @@
 
 @section('konten')
 <div class="container mx-auto px-4 py-8 max-w-4xl">
-
     {{-- Tombol Kembali --}}
-   <div class="mb-6">
-    <a href="{{ route('peserta.materials') }}" 
-       class="inline-flex items-center text-blue-600 hover:text-blue-800">
-        <svg xmlns="http://www.w3.org/2000/svg" 
-             fill="none" 
-             viewBox="0 0 24 24" 
-             stroke-width="2" 
-             stroke="currentColor" 
-             style="width: 20px; height: 20px; flex-shrink: 0; display: inline-block; vertical-align: middle;">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
-        </svg>
-        <span class="ml-2 font-medium">Kembali ke Daftar Materi</span>
-    </a>
-</div>
-
-
+    <div class="mb-6">
+        <a href="{{ route('peserta.materials') }}" 
+           class="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded-lg shadow transition-all duration-200">
+            <i class="fas fa-arrow-left"></i>
+            Kembali
+        </a>
+    </div>
 
     @isset($materi)
     {{-- Header Materi --}}
@@ -30,15 +20,14 @@
                 <div class="flex-1">
                     <h1 class="text-3xl font-bold mb-2">{{ $materi->judul }}</h1>
                     <div class="flex items-center text-blue-100">
-                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                                  d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
-                        </svg>
+                        <i class="fas fa-chalkboard-teacher mr-2"></i>
                         <span class="font-medium">{{ $materi->room->nama_room ?? 'Room' }}</span>
                     </div>
                 </div>
                 <div class="ml-4">
-                    <span class="bg-blue-400 text-white text-sm px-4 py-2 rounded-full font-medium">File</span>
+                    <span class="bg-blue-400 text-white text-sm px-4 py-2 rounded-full font-medium">
+                        {{ strtoupper($materi->tipe ?? 'File') }}
+                    </span>
                 </div>
             </div>
         </div>
@@ -65,8 +54,8 @@
             </div>
         @endif
 
-        {{-- Konten --}}
-        @if($materi->konten)
+        {{-- Konten (tambahan dari File 2) --}}
+        @if($materi->konten && $materi->tipe !== 'link')
             <div class="p-6 bg-gray-50 border-b">
                 <h3 class="text-lg font-semibold text-gray-800 mb-2">Konten</h3>
                 <div class="text-gray-700 leading-relaxed prose max-w-none">
@@ -75,46 +64,70 @@
             </div>
         @endif
 
-        {{-- Tombol Download --}}
-        <div class="p-6">
-            <a href="{{ route('peserta.materials.download', $materi->materi_id) }}" 
-               class="inline-flex items-center justify-center w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200">
-                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                          d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
-                </svg>
-                Download Materi
-            </a>
+        {{-- Tombol Aksi --}}
+        <div class="p-6 flex flex-wrap gap-3">
+            @if($materi->tipe === 'pdf')
+                <a href="{{ route('peserta.materials.view-pdf', $materi->materi_id) }}" target="_blank"
+                   class="flex-1 inline-flex items-center justify-center bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-6 rounded-lg transition">
+                    <i class="fas fa-file-pdf mr-2"></i> Lihat PDF
+                </a>
+            @elseif($materi->tipe === 'video')
+                <a href="{{ route('peserta.materials.stream', $materi->materi_id) }}" target="_blank"
+                   class="flex-1 inline-flex items-center justify-center bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-6 rounded-lg transition">
+                    <i class="fas fa-play-circle mr-2"></i> Putar Video
+                </a>
+            @elseif($materi->tipe === 'link')
+                <a href="{{ $materi->konten }}" target="_blank"
+                   class="flex-1 inline-flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition">
+                    <i class="fas fa-external-link-alt mr-2"></i> Buka Link
+                </a>
+            @endif
+
+            @if($materi->tipe !== 'link')
+                <a href="{{ route('peserta.materials.download', $materi->materi_id) }}"
+                   class="flex-1 inline-flex items-center justify-center bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg transition">
+                    <i class="fas fa-download mr-2"></i> Download
+                </a>
+            @endif
         </div>
     </div>
 
     {{-- Materi Lain di Room yang Sama --}}
-    @if($materi->room && $materi->room->materi()->where('materi_id', '!=', $materi->materi_id)->count() > 0)
-        <div class="bg-white rounded-lg shadow-lg p-6">
-            <h2 class="text-xl font-bold text-gray-800 mb-4">
-                Materi Lain dari {{ $materi->room->nama_room ?? 'Room ini' }}
-            </h2>
-
-            <div class="space-y-3">
-                @foreach($materi->room->materi()->where('materi_id', '!=', $materi->materi_id)->take(5)->get() as $otherMateri)
-                    <a href="{{ route('peserta.materials.view', $otherMateri->materi_id) }}" 
-                       class="block p-4 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors duration-200">
-                        <div class="flex items-center justify-between">
-                            <div class="flex-1">
-                                <h3 class="font-semibold text-gray-800">{{ $otherMateri->judul }}</h3>
-                                <p class="text-sm text-gray-500 mt-1">{{ $otherMateri->created_at->format('d M Y') }}</p>
-                            </div>
-                            <span class="bg-blue-100 text-blue-600 text-xs px-2 py-1 rounded ml-3">File</span>
+    {{-- Ganti 'materi' dengan 'materis' sesuai nama relasi di model Room --}}
+@if($materi->room && $materi->room->materis->where('materi_id', '!=', $materi->materi_id)->count() > 0)
+    <div class="bg-white rounded-lg shadow-lg p-6">
+        <h2 class="text-xl font-bold text-gray-800 mb-4">
+            Materi Lain dari {{ $materi->room->nama_room ?? 'Room ini' }}
+        </h2>
+        <div class="space-y-3">
+            @foreach($materi->room->materis->where('materi_id', '!=', $materi->materi_id)->take(5) as $otherMateri)
+                <a href="{{ route('peserta.materials.view', $otherMateri->materi_id) }}"
+                   class="block p-4 bg-gray-50 hover:bg-gray-100 rounded-lg transition">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="font-semibold text-gray-800">{{ $otherMateri->judul }}</h3>
+                            <p class="text-sm text-gray-500">{{ $otherMateri->created_at->format('d M Y') }}</p>
                         </div>
-                    </a>
-                @endforeach
-            </div>
+                        <span class="bg-blue-100 text-blue-600 text-xs px-2 py-1 rounded ml-3">
+                            {{ strtoupper($otherMateri->tipe ?? 'File') }}
+                        </span>
+                    </div>
+                </a>
+            @endforeach
         </div>
-    @endif
+    </div>
+@endif
+
     @else
-        <div class="text-center py-12">
+        <div class="bg-white rounded-lg shadow-lg p-8 text-center">
+            <i class="fas fa-exclamation-circle text-6xl text-gray-400 mb-4"></i>
             <h2 class="text-xl font-semibold text-gray-700 mb-2">Materi tidak ditemukan</h2>
-            <a href="{{ route('peserta.materials') }}" class="text-blue-600 hover:underline">Kembali ke daftar materi</a>
+            <p class="text-gray-500 mb-4">Materi yang Anda cari tidak tersedia atau telah dihapus.</p>
+            <a href="{{ route('peserta.materials') }}" 
+               class="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded-lg">
+                <i class="fas fa-arrow-left"></i>
+                Kembali ke Daftar Materi
+            </a>
         </div>
     @endisset
 </div>
