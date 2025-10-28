@@ -15,6 +15,7 @@ class Mentor extends Model
     protected $fillable = [
         'mentor_id',
         'handphone',
+        'signature_path',
     ];
     
     public function user()

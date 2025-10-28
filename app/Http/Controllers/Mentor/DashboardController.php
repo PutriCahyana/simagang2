@@ -16,12 +16,11 @@ class DashboardController extends Controller
     {
         // Ambil data mentor yang sedang login
         $mentor = Auth::user();
-        $judul = "Dashboard - Monitoring Peserta Magang";
-        $menuDashboard = "active";
+        
         // Ambil semua room yang dibimbing mentor ini
         // Kita ambil room pertama dulu (atau bisa disesuaikan kalau mentor punya banyak room)
         $rooms = Room::where('mentor_id', $mentor->id)->get();
-        
+        $menuDashboard = "active";
         // Untuk contoh, kita ambil data semua room yang dibimbing
         // Atau bisa filter ke room tertentu
         $roomData = [];
@@ -56,7 +55,7 @@ class DashboardController extends Controller
         // Data peserta dengan detail
         $pesertaData = $allPeserta->map(function($user) use ($rooms) {
             $pesertaDetail = $user->peserta;
-            $sisaHari = Carbon::now()->diffInDays($pesertaDetail->periode_end, false);
+            $sisaHari = (int) Carbon::now()->diffInDays($pesertaDetail->periode_end, false);
             
             // Cari room peserta ini (ambil yang pertama kalau ada di banyak room)
             $userRoom = $rooms->first(function($room) use ($user) {
@@ -299,7 +298,3 @@ class DashboardController extends Controller
         ]);
     }
 }
-        
-
-
-

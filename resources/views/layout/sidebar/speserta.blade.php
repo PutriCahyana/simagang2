@@ -45,7 +45,7 @@
     
                 <!-- Nav Item - peserta -->
                 <li class="nav-item {{ $menuDashboard ?? '' }}">
-                    <a class="nav-link" href="tables.html">
+                    <a class="nav-link" href="{{ route('peserta.logbook.index') }}">
                         <i class="fas fa-fw fa-table"></i>
                         <span>Logbook</span></a>
                 </li>

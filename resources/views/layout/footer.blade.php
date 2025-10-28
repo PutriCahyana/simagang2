@@ -4,6 +4,8 @@
     <script src="{{ asset('sbadmin2/vendor/jquery-easing/jquery.easing.min.js') }}"></script>
     <script src="{{ asset('sbadmin2/js/sb-admin-2.min.js') }}"></script>
    
+    <!-- Chart.js tambahkan di sini -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
         <!-- Page level plugins -->
     <script src="{{ asset('sbadmin2/vendor/datatables/jquery.dataTables.min.js') }}"></script>
@@ -11,6 +13,8 @@
     <script src="{{ asset('sbadmin2/js/demo/datatables-demo.js') }}"></script>
     <script src="{{ asset('sweetalert2/dist/sweetalert2.all.min.js') }}"></script>
     @stack('scripts')
+
+    
 
     {{-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script> --}}

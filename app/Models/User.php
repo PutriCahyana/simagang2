@@ -67,9 +67,30 @@ class User extends Authenticatable
     }
 
     public function mentor()
-{
-    return $this->hasOne(Mentor::class, 'mentor_id', 'id');
-}
+    {
+        return $this->hasOne(Mentor::class, 'mentor_id', 'id');
+    }
 
+/**
+ * Relationship: Logbook yang dibuat oleh user (peserta)
+ */
+    public function logbooks()
+    {
+        return $this->hasMany(Logbook::class, 'user_id');
+    }
+
+/**
+ * Relationship: Logbook yang di-approve oleh user (mentor)
+ */
+    public function approvedLogbooks()
+    {
+        return $this->hasMany(Logbook::class, 'approved_by');
+    }
+
+    public function rooms()
+    {
+        return $this->belongsToMany(Room::class, 'room_user', 'user_id', 'room_id')
+                    ->withTimestamps();
+    }
 
 }
