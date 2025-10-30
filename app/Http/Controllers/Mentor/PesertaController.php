@@ -12,8 +12,12 @@ class PesertaController extends Controller
     //Read : ambil semua peserta
     public function index()
     {
-        return Peserta::all();
+        $peserta = \App\Models\Peserta::all();
+        $judul = 'Daftar Peserta Magang';
+
+        return view('mentor.peserta.index', compact('peserta', 'judul'));
     }
+
 
     /**
      * Show the form for creating a new resource.
@@ -32,7 +36,7 @@ class PesertaController extends Controller
             'nama' => 'required',
             'nim' => 'required',
             'kampus' => 'required',
-            'jurusan' => 'required',                                                                                                                                                                                                                                                                                        
+            'jurusan' => 'required',
         ]);
 
         return Peserta::create($request->all());

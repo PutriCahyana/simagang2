@@ -22,38 +22,39 @@
             <!-- Divider -->
             <hr class="sidebar-divider">
 
-                <!-- Menu Mentor -->
-                <!-- Heading -->
-               <div class="sidebar-heading">
-                   MENU MENTOR
-               </div>
-    
-               <!-- Nav Item - Materi -->
-               <li class="nav-item {{ $menuMentorMateri ?? '' }}">
-                   <a class="nav-link" href="{{ route('mentor.materi') }}">
-                       <i class="fas fa-fw fa-table"></i>
-                       <span>Materi</span></a>
-               </li>
-    
-               <!-- Nav Item - room -->
-               <li class="nav-item {{ $menuMentorRoom ?? '' }}">
-                   <a class="nav-link" href="{{ route('mentor.room') }}">
-                       <i class="fas fa-fw fa-table"></i>
-                       <span>Room</span></a>
-               </li>
-    
-               <!-- Nav Item - peserta -->
-               <li class="nav-item {{ $menuMentorPeserta ?? '' }}">
-                   <a class="nav-link" href="tables.html">
-                       <i class="fas fa-fw fa-table"></i>
-                       <span>Peserta</span></a>
-               </li>
+            <!-- Menu Mentor -->
+            <!-- Heading -->
+            <div class="sidebar-heading">
+                MENU MENTOR
+            </div>
 
-               <li class="nav-item {{ $menuMentorPeserta ?? '' }}">
-                   <a class="nav-link" href="{{ route('mentor.logbook.index') }}">
-                       <i class="fas fa-fw fa-table"></i>
-                       <span>Logbook</span></a>
-               </li>
+            <!-- Nav Item - Materi -->
+            <li class="nav-item {{ $menuMentorMateri ?? '' }}">
+                <a class="nav-link" href="{{ route('mentor.materi') }}">
+                    <i class="fas fa-fw fa-table"></i>
+                    <span>Materi</span></a>
+            </li>
+
+            <!-- Nav Item - room -->
+            <li class="nav-item {{ $menuMentorRoom ?? '' }}">
+                <a class="nav-link" href="{{ route('mentor.room') }}">
+                    <i class="fas fa-fw fa-table"></i>
+                    <span>Room</span></a>
+            </li>
+
+            <!-- Nav Item - peserta -->
+            <li class="nav-item {{ $menuMentorPeserta ?? '' }}">
+                <a href="{{ route('mentor.peserta') }}" class="nav-link">
+                    <i class="fas fa-users"></i>
+                    <span>Peserta</span></a>
+                </a>
+            </li>
+
+            <li class="nav-item {{ $menuMentorPeserta ?? '' }}">
+                <a class="nav-link" href="{{ route('mentor.logbook.index') }}">
+                    <i class="fas fa-fw fa-table"></i>
+                    <span>Logbook</span></a>
+            </li>
 
 
 

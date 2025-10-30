@@ -20,7 +20,7 @@ use App\Http\Controllers\Mentor\ProfileController as MentorProfileController;
 use App\Http\Controllers\Admin\LogbookController as AdminLogbookController;
 
 // ===== PUBLIC ROUTES =====
-Route::get('/', function(){
+Route::get('/', function () {
     return view('welcome');
 })->name('welcome');
 
@@ -37,20 +37,20 @@ Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
 
 // ===== DASHBOARD (SEMUA ROLE BISA AKSES) =====
 // Route::middleware('MidLogin')->group(function(){
-    
+
 // });
 
 // ===== ADMIN ROUTES =====
-Route::middleware(['MidLogin:admin'])->group(function(){
+Route::middleware(['MidLogin:admin'])->group(function () {
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
     // User Management
     Route::get('user', [UserController::class, 'index'])->name('user');
-    
+
     // Materi Management
     Route::get('materi', [MateriController::class, 'index'])->name('materi');
     Route::get('materi/create', [MateriController::class, 'create'])->name('materiCreate');
     Route::post('materi/store', [MateriController::class, 'store'])->name('materiStore');
-    
+
     // Room Management
     Route::get('room', [RoomController::class, 'index'])->name('room');
     Route::get('room/create', [RoomController::class, 'create'])->name('roomCreate');
@@ -60,7 +60,7 @@ Route::middleware(['MidLogin:admin'])->group(function(){
 });
 
 // ===== MENTOR ROUTES =====
-Route::middleware(['MidLogin:mentor'])->group(function(){
+Route::middleware(['MidLogin:mentor'])->group(function () {
     //dashboard
     Route::get('mentor/dashboard', [MentorDashboardController::class, 'index'])->name('mentor.dashboard');
     //api endpoints untuk modal
@@ -78,12 +78,12 @@ Route::middleware(['MidLogin:mentor'])->group(function(){
     Route::get('mentor/logbook', [MentorLogbookController::class, 'index'])->name('mentor.logbook.index');
     Route::post('mentor/logbook/{id}/approve', [MentorLogbookController::class, 'toggleApproval'])->name('mentor.logbook.approve');
     Route::put('mentor/logbook/{id}/keterangan', [MentorLogbookController::class, 'updateKeterangan'])->name('mentor.logbook.keterangan');
-    
+
     // Profile
     Route::get('/profile', [MentorProfileController::class, 'index'])->name('profile');
     Route::put('/profile', [MentorProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile/signature', [MentorProfileController::class, 'deleteSignature'])->name('profile.signature.delete');
-    
+
     // Room Mentor
     Route::get('mentor/room', [MentorRoomController::class, 'index'])->name('mentor.room');
     Route::get('mentor/room/create', [MentorRoomController::class, 'create'])->name('mentor.roomCreate');
@@ -91,26 +91,25 @@ Route::middleware(['MidLogin:mentor'])->group(function(){
 
     Route::prefix('mentor')->name('mentor.')->group(function () {
         Route::get('/room/{room_id}', [MentorRoomViewController::class, 'show'])->name('room.show');
-        
+
         // API untuk get data
         Route::get('/room/{room_id}/participants', [MentorRoomViewController::class, 'getParticipants']);
         Route::get('/room/{room_id}/tasks', [MentorRoomViewController::class, 'getTasks']);
-        
+
         // API untuk create task
         Route::post('/room/{room_id}/tasks', [MentorRoomViewController::class, 'storeTask']);
-
     });
-    
+
     // Peserta Mentor
-    // Route::get('mentor/peserta', [MentorPesertaController:class, 'mentorPeserta'])->name('mentor.peserta');
+    Route::get('mentor/peserta', [MentorPesertaController::class, 'index'])->name('mentor.peserta');
 });
 
 // ===== PESERTA ROUTES =====
-Route::middleware(['MidLogin:peserta'])->group(function(){
+Route::middleware(['MidLogin:peserta'])->group(function () {
     Route::get('peserta/dashboard', [PesertaDashboardController::class, 'index'])->name('peserta.dashboard');
     Route::get('peserta/roomlist', [PesertaParticipantRoomController::class, 'index'])->name('peserta.roomlist');
     Route::post('peserta/roomlist/join', [PesertaParticipantRoomController::class, 'join'])->name('peserta.roomlist.join');
-    // Route::get('peserta/room/join', [PesertaRoomController::class, ''])->name('peserta.roomlist');
+    //Route::get('peserta/room/join', [PesertaRoomController::class, ''])->name('peserta.roomlist');
     Route::get('peserta/materials', [PesertaMateriController::class, 'index'])->name('peserta.materials');
     Route::get('peserta/materials/{id}', [PesertaMateriController::class, 'view'])->name('peserta.materials.view');
     Route::get('peserta/materials/{id}/download', [PesertaMateriController::class, 'download'])->name('peserta.materials.download');
@@ -124,7 +123,7 @@ Route::middleware(['MidLogin:peserta'])->group(function(){
     Route::get('peserta/logbook/{id}/edit', [PesertaLogbookController::class, 'edit'])->name('peserta.logbook.edit');
     Route::put('peserta/logbook/{id}', [PesertaLogbookController::class, 'update'])->name('peserta.logbook.update');
     Route::delete('peserta/logbook/{id}', [PesertaLogbookController::class, 'destroy'])->name('peserta.logbook.destroy');
-    
+
     // Export
     Route::get('peserta/logbook/export/pdf', [PesertaLogbookController::class, 'exportPdf'])->name('peserta.logbook.export.pdf');
     Route::get('peserta/logbook/export/excel', [PesertaLogbookController::class, 'exportExcel'])->name('peserta.logbook.export.excel');
@@ -132,17 +131,14 @@ Route::middleware(['MidLogin:peserta'])->group(function(){
 
     Route::prefix('peserta')->name('peserta.')->group(function () {
 
-         Route::get('/rooms/{room_id}', [MentorRoomViewController::class, 'show'])
-            ->name('mentor.room.show'); 
-        
+        Route::get('/rooms/{room_id}', [MentorRoomViewController::class, 'show'])
+            ->name('mentor.room.show');
+
         // API untuk get data
         Route::get('/rooms/{room_id}/participants', [MentorRoomViewController::class, 'getParticipants']);
         Route::get('/rooms/{room_id}/tasks', [MentorRoomViewController::class, 'getTasks']);
-        
+
         // API untuk create task
         Route::post('/rooms/{room_id}/tasks', [MentorRoomViewController::class, 'storeTask']);
     });
-
- 
 });
-
