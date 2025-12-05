@@ -268,252 +268,254 @@
         </div>
     </div>
 
+    @push('scripts')
     <script>
-        // Setup CSRF token untuk AJAX
-        $.ajaxSetup({
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+    // Setup CSRF token untuk AJAX
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
+
+    function showRoomDetail() {
+        $.get('/mentor/room-detail', function(data) {
+            $('#roomModalTitle').text('Daftar Semua Peserta Aktif');
+            const tbody = $('#roomTableBody');
+            tbody.empty();
+            
+            if (data.length === 0) {
+                tbody.append('<tr><td colspan="7" class="text-center">Tidak ada peserta aktif</td></tr>');
+            } else {
+                data.forEach((item, index) => {
+                    tbody.append(`
+                        <tr>
+                            <td>${index + 1}</td>
+                            <td><a href="/mentor/peserta/${item.id}" class="text-primary font-weight-bold">${item.nama}</a></td>
+                            <td>${item.institut}</td>
+                            <td>${item.periode}</td>
+                            <td><span class="badge badge-warning">${item.sisaHari} hari</span></td>
+                            <td><span class="badge badge-success">${item.status}</span></td>
+                            <td>${item.room}</td>
+                        </tr>
+                    `);
+                });
             }
+            
+            $('#roomModal').modal('show');
+        }).fail(function(xhr, status, error) {
+            console.error('Error:', error);
+            alert('Gagal memuat data peserta. Silakan coba lagi.');
         });
+    }
 
-        function showRoomDetail() {
-            $.get('/mentor/room-detail', function(data) {
-                $('#roomModalTitle').text('Daftar Semua Peserta Aktif');
-                const tbody = $('#roomTableBody');
-                tbody.empty();
-                
-                if (data.length === 0) {
-                    tbody.append('<tr><td colspan="7" class="text-center">Tidak ada peserta aktif</td></tr>');
-                } else {
-                    data.forEach((item, index) => {
-                        tbody.append(`
-                            <tr>
-                                <td>${index + 1}</td>
-                                <td><strong>${item.nama}</strong></td>
-                                <td>${item.institut}</td>
-                                <td>${item.periode}</td>
-                                <td><span class="badge badge-warning">${item.sisaHari} hari</span></td>
-                                <td><span class="badge badge-success">${item.status}</span></td>
-                                <td>${item.room}</td>
-                            </tr>
-                        `);
-                    });
-                }
-                
-                $('#roomModal').modal('show');
-            }).fail(function(xhr, status, error) {
-                console.error('Error:', error);
-                alert('Gagal memuat data peserta. Silakan coba lagi.');
-            });
-        }
-
-        function showRoomDetailById(roomId) {
-            console.log('Loading room detail for ID:', roomId);
+    function showRoomDetailById(roomId) {
+        console.log('Loading room detail for ID:', roomId);
+        
+        $.get(`/mentor/room/${roomId}/detail`, function(response) {
+            $('#roomModalTitle').text(`Daftar Peserta ${response.room}`);
+            const tbody = $('#roomTableBody');
+            tbody.empty();
             
-            $.get(`/mentor/room/${roomId}/detail`, function(response) {
-                $('#roomModalTitle').text(`Daftar Peserta ${response.room}`);
-                const tbody = $('#roomTableBody');
-                tbody.empty();
-                
-                if (response.peserta.length === 0) {
-                    tbody.append('<tr><td colspan="7" class="text-center">Tidak ada peserta aktif di room ini</td></tr>');
-                } else {
-                    response.peserta.forEach((item, index) => {
-                        tbody.append(`
-                            <tr>
-                                <td>${index + 1}</td>
-                                <td><strong>${item.nama}</strong></td>
-                                <td>${item.institut}</td>
-                                <td>${item.periode}</td>
-                                <td><span class="badge badge-warning">${item.sisaHari} hari</span></td>
-                                <td><span class="badge badge-success">${item.status}</span></td>
-                                <td>${response.room}</td>
-                            </tr>
-                        `);
-                    });
-                }
-                
-                $('#roomModal').modal('show');
-            }).fail(function(xhr, status, error) {
-                console.error('Error:', error);
-                console.error('Response:', xhr.responseText);
-                alert('Gagal memuat data peserta. Error: ' + xhr.status);
-            });
-        }
-
-        function showPeriodDetail(periode, days) {
-            $('#periodModalTitle').html(`<i class="fas fa-calendar-alt mr-2"></i>Peserta Periode ${periode} <span class="badge badge-light ml-2">${days} hari tersisa</span>`);
+            if (response.peserta.length === 0) {
+                tbody.append('<tr><td colspan="7" class="text-center">Tidak ada peserta aktif di room ini</td></tr>');
+            } else {
+                response.peserta.forEach((item, index) => {
+                    tbody.append(`
+                        <tr>
+                            <td>${index + 1}</td>
+                            <td><a href="/mentor/peserta/${item.id}" class="text-primary font-weight-bold">${item.nama}</a></td>
+                            <td>${item.institut}</td>
+                            <td>${item.periode}</td>
+                            <td><span class="badge badge-warning">${item.sisaHari} hari</span></td>
+                            <td><span class="badge badge-success">${item.status}</span></td>
+                            <td>${response.room}</td>
+                        </tr>
+                    `);
+                });
+            }
             
-            $.get(`/mentor/period/${encodeURIComponent(periode)}`, function(data) {
-                const tbody = $('#periodTableBody');
-                tbody.empty();
-                
-                if (data.length === 0) {
-                    tbody.append('<tr><td colspan="5" class="text-center">Tidak ada peserta di periode ini</td></tr>');
-                } else {
-                    data.forEach((item, index) => {
-                        tbody.append(`
-                            <tr>
-                                <td>${index + 1}</td>
-                                <td><strong>${item.nama}</strong></td>
-                                <td>${item.institut}</td>
-                                <td><span class="badge badge-info">${item.sisaHari} hari</span></td>
-                                <td><span class="badge badge-success">${item.status}</span></td>
-                            </tr>
-                        `);
-                    });
-                }
-                
-                $('#periodModal').modal('show');
-            }).fail(function(xhr, status, error) {
-                console.error('Error:', error);
-                alert('Gagal memuat data periode. Silakan coba lagi.');
-            });
-        }
+            $('#roomModal').modal('show');
+        }).fail(function(xhr, status, error) {
+            console.error('Error:', error);
+            console.error('Response:', xhr.responseText);
+            alert('Gagal memuat data peserta. Error: ' + xhr.status);
+        });
+    }
 
-        function showInstitutDetail(institut, type) {
-            $('#institutModalTitle').html(`<i class="fas fa-university mr-2"></i>Peserta dari ${institut}`);
+    function showPeriodDetail(periode, days) {
+        $('#periodModalTitle').html(`<i class="fas fa-calendar-alt mr-2"></i>Peserta Periode ${periode} <span class="badge badge-light ml-2">${days} hari tersisa</span>`);
+        
+        $.get(`/mentor/period/${encodeURIComponent(periode)}`, function(data) {
+            const tbody = $('#periodTableBody');
+            tbody.empty();
             
-            $.get(`/mentor/institut/${encodeURIComponent(institut)}/${type}`, function(data) {
-                const tbody = $('#institutTableBody');
-                tbody.empty();
-                
-                if (data.length === 0) {
-                    tbody.append('<tr><td colspan="5" class="text-center">Tidak ada peserta dari institut ini</td></tr>');
-                } else {
-                    data.forEach((item, index) => {
-                        const statusBadge = item.status === 'Aktif' ? 'badge-success' : 'badge-secondary';
-                        const sisaInfo = item.status === 'Aktif' ? 
-                            `<span class="badge badge-warning">${item.sisaHari} hari</span>` : 
-                            `<span class="badge badge-secondary">${item.selesai}</span>`;
-                        
-                        tbody.append(`
-                            <tr>
-                                <td>${index + 1}</td>
-                                <td><strong>${item.nama}</strong></td>
-                                <td>${item.periode}</td>
-                                <td>${sisaInfo}</td>
-                                <td><span class="badge ${statusBadge}">${item.status}</span></td>
-                            </tr>
-                        `);
-                    });
+            if (data.length === 0) {
+                tbody.append('<tr><td colspan="5" class="text-center">Tidak ada peserta di periode ini</td></tr>');
+            } else {
+                data.forEach((item, index) => {
+                    tbody.append(`
+                        <tr>
+                            <td>${index + 1}</td>
+                            <td><a href="/mentor/peserta/${item.id}" class="text-primary font-weight-bold">${item.nama}</a></td>
+                            <td>${item.institut}</td>
+                            <td><span class="badge badge-info">${item.sisaHari} hari</span></td>
+                            <td><span class="badge badge-success">${item.status}</span></td>
+                        </tr>
+                    `);
+                });
+            }
+            
+            $('#periodModal').modal('show');
+        }).fail(function(xhr, status, error) {
+            console.error('Error:', error);
+            alert('Gagal memuat data periode. Silakan coba lagi.');
+        });
+    }
+
+    function showInstitutDetail(institut, type) {
+        $('#institutModalTitle').html(`<i class="fas fa-university mr-2"></i>Peserta dari ${institut}`);
+        
+        $.get(`/mentor/institut/${encodeURIComponent(institut)}/${type}`, function(data) {
+            const tbody = $('#institutTableBody');
+            tbody.empty();
+            
+            if (data.length === 0) {
+                tbody.append('<tr><td colspan="5" class="text-center">Tidak ada peserta dari institut ini</td></tr>');
+            } else {
+                data.forEach((item, index) => {
+                    const statusBadge = item.status === 'Aktif' ? 'badge-success' : 'badge-secondary';
+                    const sisaInfo = item.status === 'Aktif' ? 
+                        `<span class="badge badge-warning">${item.sisaHari} hari</span>` : 
+                        `<span class="badge badge-secondary">${item.selesai}</span>`;
+                    
+                    tbody.append(`
+                        <tr>
+                            <td>${index + 1}</td>
+                            <td><a href="/mentor/peserta/${item.id}" class="text-primary font-weight-bold">${item.nama}</a></td>
+                            <td>${item.periode}</td>
+                            <td>${sisaInfo}</td>
+                            <td><span class="badge ${statusBadge}">${item.status}</span></td>
+                        </tr>
+                    `);
+                });
+            }
+            
+            $('#institutModal').modal('show');
+        }).fail(function(xhr, status, error) {
+            console.error('Error:', error);
+            alert('Gagal memuat data institut. Silakan coba lagi.');
+        });
+    }
+
+    // Data untuk chart dari backend
+    const institutActiveData = @json($institutActive);
+    const institutCompletedData = @json($institutCompleted);
+
+    // Active Participants Chart
+    const activeCtx = document.getElementById('activeChart').getContext('2d');
+    const activeChart = new Chart(activeCtx, {
+        type: 'bar',
+        data: {
+            labels: institutActiveData.map(item => item.institut),
+            datasets: [{
+                label: 'Peserta Aktif',
+                data: institutActiveData.map(item => item.total),
+                backgroundColor: 'rgba(78, 115, 223, 0.8)',
+                borderColor: 'rgba(78, 115, 223, 1)',
+                borderWidth: 2,
+                borderRadius: 5
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            onClick: (e, activeEls) => {
+                if (activeEls.length > 0) {
+                    const index = activeEls[0].index;
+                    const label = activeChart.data.labels[index];
+                    showInstitutDetail(label, 'active');
                 }
-                
-                $('#institutModal').modal('show');
-            }).fail(function(xhr, status, error) {
-                console.error('Error:', error);
-                alert('Gagal memuat data institut. Silakan coba lagi.');
-            });
-        }
-
-        // Data untuk chart dari backend
-        const institutActiveData = @json($institutActive);
-        const institutCompletedData = @json($institutCompleted);
-
-        // Active Participants Chart
-        const activeCtx = document.getElementById('activeChart').getContext('2d');
-        const activeChart = new Chart(activeCtx, {
-            type: 'bar',
-            data: {
-                labels: institutActiveData.map(item => item.institut),
-                datasets: [{
-                    label: 'Peserta Aktif',
-                    data: institutActiveData.map(item => item.total),
-                    backgroundColor: 'rgba(78, 115, 223, 0.8)',
-                    borderColor: 'rgba(78, 115, 223, 1)',
-                    borderWidth: 2,
-                    borderRadius: 5
-                }]
             },
-            options: {
-                responsive: true,
-                maintainAspectRatio: true,
-                onClick: (e, activeEls) => {
-                    if (activeEls.length > 0) {
-                        const index = activeEls[0].index;
-                        const label = activeChart.data.labels[index];
-                        showInstitutDetail(label, 'active');
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            stepSize: 1
-                        }
-                    }
-                },
-                plugins: {
-                    legend: {
-                        display: true,
-                        position: 'top'
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                return context.dataset.label + ': ' + context.parsed.y + ' peserta';
-                            },
-                            afterLabel: function() {
-                                return '👆 Klik untuk detail';
-                            }
-                        }
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1
                     }
                 }
-            }
-        });
-
-        // Completed Participants Chart
-        const completedCtx = document.getElementById('completedChart').getContext('2d');
-        const completedChart = new Chart(completedCtx, {
-            type: 'bar',
-            data: {
-                labels: institutCompletedData.map(item => item.institut),
-                datasets: [{
-                    label: 'Peserta Selesai',
-                    data: institutCompletedData.map(item => item.total),
-                    backgroundColor: 'rgba(28, 200, 138, 0.8)',
-                    borderColor: 'rgba(28, 200, 138, 1)',
-                    borderWidth: 2,
-                    borderRadius: 5
-                }]
             },
-            options: {
-                responsive: true,
-                maintainAspectRatio: true,
-                onClick: (e, activeEls) => {
-                    if (activeEls.length > 0) {
-                        const index = activeEls[0].index;
-                        const label = completedChart.data.labels[index];
-                        showInstitutDetail(label, 'completed');
-                    }
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'top'
                 },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            stepSize: 1
-                        }
-                    }
-                },
-                plugins: {
-                    legend: {
-                        display: true,
-                        position: 'top'
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                return context.dataset.label + ': ' + context.parsed.y + ' peserta';
-                            },
-                            afterLabel: function() {
-                                return '👆 Klik untuk detail';
-                            }
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return context.dataset.label + ': ' + context.parsed.y + ' peserta';
+                        },
+                        afterLabel: function() {
+                            return '👆 Klik untuk detail';
                         }
                     }
                 }
             }
-        });
-    </script>
+        }
+    });
+
+    // Completed Participants Chart
+    const completedCtx = document.getElementById('completedChart').getContext('2d');
+    const completedChart = new Chart(completedCtx, {
+        type: 'bar',
+        data: {
+            labels: institutCompletedData.map(item => item.institut),
+            datasets: [{
+                label: 'Peserta Selesai',
+                data: institutCompletedData.map(item => item.total),
+                backgroundColor: 'rgba(28, 200, 138, 0.8)',
+                borderColor: 'rgba(28, 200, 138, 1)',
+                borderWidth: 2,
+                borderRadius: 5
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            onClick: (e, activeEls) => {
+                if (activeEls.length > 0) {
+                    const index = activeEls[0].index;
+                    const label = completedChart.data.labels[index];
+                    showInstitutDetail(label, 'completed');
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'top'
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return context.dataset.label + ': ' + context.parsed.y + ' peserta';
+                        },
+                        afterLabel: function() {
+                            return '👆 Klik untuk detail';
+                        }
+                    }
+                }
+            }
+        }
+    });
+</script>
+    @endpush
 </body>
 </html>
 @endsection

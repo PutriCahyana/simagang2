@@ -93,4 +93,20 @@ class User extends Authenticatable
                     ->withTimestamps();
     }
 
+    // ============================================
+// UNTUK MENTOR: rooms yang dia kelola
+// ============================================
+    public function managedRooms()
+    {
+        // Via tabel mentor dulu, baru ke rooms
+        return $this->hasManyThrough(
+            Room::class,      // Model tujuan
+            Mentor::class,    // Model perantara
+            'mentor_id',      // FK di tabel mentor (kolom di tabel mentor yang referensi ke users.id)
+            'mentor_id',      // FK di tabel room (kolom di tabel room yang referensi ke mentor.mentor_id)
+            'id',             // PK di tabel users
+            'mentor_id'       // PK di tabel mentor
+        );
+    }
+
 }

@@ -16,6 +16,7 @@ class Materi extends Model
         'konten',
     ];
 
+
     public function room()
     {
         return $this->belongsTo(Room::class, 'room_id', 'room_id');
