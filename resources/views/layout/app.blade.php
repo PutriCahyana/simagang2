@@ -46,6 +46,10 @@
                                 <a class="dropdown-item" href="#">
                                     <div class="badge badge-success justify-content-center d-flex">{{ auth()->user()->role }}</div>
                                 </a>
+                                 <a class="dropdown-item" href="#">
+                                    <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
+                                    Profile
+                                </a>
                                 <a class="dropdown-item" href="#">
                                     <i class="fas fa-cog fa-sm fa-fw mr-2 text-gray-400"></i>
                                     Settings

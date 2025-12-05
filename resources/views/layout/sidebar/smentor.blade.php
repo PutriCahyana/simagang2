@@ -44,7 +44,7 @@
     
                <!-- Nav Item - peserta -->
                <li class="nav-item {{ $menuMentorPeserta ?? '' }}">
-                   <a class="nav-link" href="tables.html">
+                   <a class="nav-link" href="{{ route('mentor.peserta.index') }}">
                        <i class="fas fa-fw fa-table"></i>
                        <span>Peserta</span></a>
                </li>

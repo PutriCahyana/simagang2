@@ -14,10 +14,12 @@
     <!-- Filter -->
     <div class="card mb-4">
         <div class="card-body">
-            <form action="{{ route('mentor.logbook.index') }}" method="GET" class="row g-3">
-                <div class="col-md-4">
-                    <label class="form-label">Filter by Room</label>
-                    <select name="room_id" class="form-select">
+            <form id="filterForm" action="{{ route('mentor.logbook.index') }}" method="GET" class="row g-3 align-items-end">
+                <div class="col-md-5">
+                    <label class="form-label fw-semibold mb-2" style="font-size: 0.95rem;">
+                        <i class="bi bi-door-open me-1"></i> Filter by Room
+                    </label>
+                    <select name="room_id" class="form-select form-select-lg" onchange="this.form.submit()" style="font-size: 1rem;">
                         <option value="">Semua Room</option>
                         @foreach($rooms as $room)
                             <option value="{{ $room->room_id }}" {{ request('room_id') == $room->room_id ? 'selected' : '' }}>
@@ -26,24 +28,20 @@
                         @endforeach
                     </select>
                 </div>
-                <div class="col-md-4">
-                    <label class="form-label">Filter by Status</label>
-                    <select name="status" class="form-select">
+                <div class="col-md-5">
+                    <label class="form-label fw-semibold mb-2" style="font-size: 0.95rem;">
+                        <i class="bi bi-check-circle me-1"></i> Filter by Status
+                    </label>
+                    <select name="status" class="form-select form-select-lg" onchange="this.form.submit()" style="font-size: 1rem;">
                         <option value="">Semua Status</option>
                         <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Pending</option>
                         <option value="approved" {{ request('status') == 'approved' ? 'selected' : '' }}>Approved</option>
                     </select>
                 </div>
-                <div class="col-md-4">
-                    <label class="form-label">&nbsp;</label>
-                    <div>
-                        <button type="submit" class="btn btn-primary">
-                            <i class="bi bi-filter"></i> Filter
-                        </button>
-                        <a href="{{ route('mentor.logbook.index') }}" class="btn btn-secondary">
-                            <i class="bi bi-arrow-clockwise"></i> Reset
-                        </a>
-                    </div>
+                <div class="col-md-2">
+                    <a href="{{ route('mentor.logbook.index') }}" class="btn btn-secondary w-100" style="padding: 0.6rem;">
+                        <i class="bi bi-arrow-clockwise"></i> Reset
+                    </a>
                 </div>
             </form>
         </div>
@@ -64,7 +62,7 @@
                             <th>Keterangan</th>
                             <th>Room</th>
                             <th>Status</th>
-                            <th>Aksi</th>
+                            <th class="text-center" style="width: 100px;">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -72,7 +70,10 @@
                             <tr>
                                 <td>{{ $logbooks->firstItem() + $index }}</td>
                                 <td>
-                                    <strong>{{ $logbook->user->nama }}</strong><br>
+                                    <a href="{{ route('mentor.peserta.show', $logbook->user->id) }}" class="text-decoration-none">
+                                        <strong class="text-primary">{{ $logbook->user->nama }}</strong>
+                                    </a>
+                                    <br>
                                     <small class="text-muted">{{ $logbook->user->username }}</small>
                                 </td>
                                 <td>{{ $logbook->date->format('d/m/Y') }}</td>
@@ -95,33 +96,40 @@
                                 <td>
                                     @if($logbook->is_approved)
                                         <span class="badge bg-success">
-                                            <i class="fas fa-check-circle"></i> Approved
+                                            <i class="bi bi-check-circle-fill"></i> Approved
                                         </span>
                                     @else
-                                        <span class="badge bg-warning">
-                                            <i class="fas fa-clock"></i> Pending
+                                        <span class="badge bg-warning text-dark">
+                                            <i class="bi bi-clock-fill"></i> Pending
                                         </span>
                                     @endif
                                 </td>
-                                <td>
+                                <td class="text-center">
                                     <form action="{{ route('mentor.logbook.approve', $logbook->id) }}" method="POST" class="d-inline">
                                         @csrf
-                                        <button type="submit" 
-                                                class="btn btn-sm {{ $logbook->is_approved ? 'btn-outline-danger' : 'btn-outline-success' }}"
-                                                title="{{ $logbook->is_approved ? 'Unapprove' : 'Approve' }}">
-                                            @if($logbook->is_approved)
-                                                <i class="fas fa-x-circle"></i>
-                                            @else
-                                                <i class="fas fa-check-circle"></i>
-                                            @endif
-                                        </button>
+                                        @if($logbook->is_approved)
+                                            <button type="submit" 
+                                                    class="btn btn-sm btn-outline-danger"
+                                                    title="Unapprove"
+                                                    style="min-width: 80px;">
+                                                <i class="bi bi-x-circle"></i> Batal
+                                            </button>
+                                        @else
+                                            <button type="submit" 
+                                                    class="btn btn-sm btn-success"
+                                                    title="Approve"
+                                                    style="min-width: 80px;">
+                                                <i class="bi bi-check-circle"></i> Approve
+                                            </button>
+                                        @endif
                                     </form>
                                 </td>
                             </tr>
                         @empty
                             <tr>
                                 <td colspan="9" class="text-center py-4 text-muted">
-                                    Belum ada logbook dari peserta.
+                                    <i class="bi bi-inbox" style="font-size: 2rem;"></i>
+                                    <p class="mb-0 mt-2">Belum ada logbook dari peserta.</p>
                                 </td>
                             </tr>
                         @endforelse

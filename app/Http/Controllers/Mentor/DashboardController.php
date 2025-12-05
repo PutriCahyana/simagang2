@@ -55,7 +55,7 @@ class DashboardController extends Controller
         // Data peserta dengan detail
         $pesertaData = $allPeserta->map(function($user) use ($rooms) {
             $pesertaDetail = $user->peserta;
-            $sisaHari = (int) Carbon::now()->diffInDays($pesertaDetail->periode_end, false);
+            $sisaHari = max(0, (int) Carbon::now()->diffInDays($pesertaDetail->periode_end, false));
             
             // Cari room peserta ini (ambil yang pertama kalau ada di banyak room)
             $userRoom = $rooms->first(function($room) use ($user) {
@@ -162,8 +162,9 @@ class DashboardController extends Controller
                            $user->peserta->periode_end >= Carbon::now();
                 })
                 ->map(function($user) {
-                    $sisaHari = Carbon::now()->diffInDays($user->peserta->periode_end, false);
+                    $sisaHari = (int) Carbon::now()->diffInDays($user->peserta->periode_end, false);
                     return [
+                        'id' => $user->id,
                         'nama' => $user->nama,
                         'institut' => $user->peserta->institut,
                         'sisaHari' => max(0, $sisaHari),
@@ -196,8 +197,9 @@ class DashboardController extends Controller
                                $user->peserta->periode_end >= Carbon::now();
                     })
                     ->map(function($user) {
-                        $sisaHari = Carbon::now()->diffInDays($user->peserta->periode_end, false);
+                        $sisaHari = (int) Carbon::now()->diffInDays($user->peserta->periode_end, false);
                         return [
+                            'id' => $user->id,
                             'nama' => $user->nama,
                             'periode' => Carbon::parse($user->peserta->periode_start)->format('F') . ' - ' . 
                                        Carbon::parse($user->peserta->periode_end)->format('F'),
@@ -216,6 +218,7 @@ class DashboardController extends Controller
                     })
                     ->map(function($user) {
                         return [
+                            'id' => $user->id,
                             'nama' => $user->nama,
                             'periode' => Carbon::parse($user->peserta->periode_start)->format('F Y') . ' - ' . 
                                        Carbon::parse($user->peserta->periode_end)->format('F Y'),
@@ -247,8 +250,9 @@ class DashboardController extends Controller
                     return $user->peserta && $user->peserta->periode_end >= Carbon::now();
                 })
                 ->map(function($user) use ($room) {
-                    $sisaHari = Carbon::now()->diffInDays($user->peserta->periode_end, false);
+                    $sisaHari = (int) Carbon::now()->diffInDays($user->peserta->periode_end, false);
                     return [
+                        'id' => $user->id,
                         'nama' => $user->nama,
                         'institut' => $user->peserta->institut,
                         'periode' => Carbon::parse($user->peserta->periode_start)->format('F') . ' - ' . 
@@ -280,8 +284,9 @@ class DashboardController extends Controller
                 return $user->peserta && $user->peserta->periode_end >= Carbon::now();
             })
             ->map(function($user) {
-                $sisaHari = Carbon::now()->diffInDays($user->peserta->periode_end, false);
+                $sisaHari = (int) Carbon::now()->diffInDays($user->peserta->periode_end, false);
                 return [
+                    'id' => $user->id,
                     'nama' => $user->nama,
                     'institut' => $user->peserta->institut,
                     'periode' => Carbon::parse($user->peserta->periode_start)->format('F') . ' - ' . 
