@@ -1,8 +1,7 @@
 <?php
 
-namespace App\Http\Controllers\Mentor;
+namespace App\Http\Controllers\Admin;
 
-use Log;
 use App\Models\Room;
 use App\Models\Task;
 use App\Models\Materi;
@@ -20,21 +19,16 @@ class RoomViewController extends Controller
             ->where('room_id', $room_id)
             ->firstOrFail();
         
-        // Pastikan yang akses adalah mentor dari room ini
-        if ($room->mentor_id !== Auth::user()->mentor->mentor_id) {
-            abort(403, 'Unauthorized');
-        }
+        // Admin bisa akses semua room tanpa pengecekan mentor_id
         
-        return view('mentor.room.show', compact('room'));
+        return view('admin.room.show', compact('room'));
     }
     
     public function getParticipants($room_id)
     {
         $room = Room::where('room_id', $room_id)->firstOrFail();
         
-        if ($room->mentor_id !== Auth::user()->mentor->mentor_id) {
-            return response()->json(['error' => 'Unauthorized'], 403);
-        }
+        // Admin bisa akses semua room
         
         // Ambil peserta dari pivot table room_user
         $participants = $room->users()
@@ -54,12 +48,9 @@ class RoomViewController extends Controller
 
     public function showParticipant($room_id, $user_id)
     {
-        $room = Room::where('room_id', $room_id)->firstOrFail();
+        $room = Room::with(['mentor.user'])->where('room_id', $room_id)->firstOrFail();
         
-        // Pastikan yang akses adalah mentor dari room ini
-        if ($room->mentor_id !== Auth::user()->mentor->mentor_id) {
-            abort(403, 'Unauthorized');
-        }
+        // Admin bisa akses semua room
         
         // Ambil peserta yang ada di room ini
         $peserta = \App\Models\User::whereHas('joinedRooms', function ($query) use ($room_id) {
@@ -70,71 +61,14 @@ class RoomViewController extends Controller
             ->with(['peserta', 'joinedRooms'])
             ->firstOrFail();
         
-        return view('mentor.room.participant', compact('peserta', 'room'));
-    }
-
-    public function removeParticipant(Request $request, $room_id, $user_id)
-    {
-        try {
-            $room = Room::where('room_id', $room_id)->firstOrFail();
-            
-            // Pastikan yang akses adalah mentor dari room ini
-            $user = Auth::user();
-            if (!$user->mentor || $room->mentor_id !== $user->mentor->mentor_id) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Anda tidak memiliki akses untuk mengeluarkan peserta dari room ini'
-                ], 403);
-            }
-            
-            // Cek apakah peserta ada di room ini
-            $participant = \App\Models\User::whereHas('joinedRooms', function ($query) use ($room_id) {
-                    $query->where('room.room_id', $room_id);
-                })
-                ->where('id', $user_id)
-                ->where('role', 'peserta')
-                ->first();
-            
-            if (!$participant) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Peserta tidak ditemukan di room ini'
-                ], 404);
-            }
-            
-            // Hapus peserta dari room (detach dari pivot table)
-            $room->users()->detach($user_id);
-            
-            // Log activity
-            Activity::create([
-                'user_id' => Auth::id(),
-                'room_id' => $room_id,
-                'type' => 'participant_removed',
-                'description' => 'Removed participant: ' . $participant->nama,
-            ]);
-            
-            return response()->json([
-                'success' => true,
-                'message' => 'Peserta berhasil dikeluarkan dari room',
-                'redirect' => route('mentor.room.show', $room_id)
-            ], 200);
-            
-        } catch (\Exception $e) {
-            \Log::error('Error removing participant: ' . $e->getMessage());
-            return response()->json([
-                'success' => false,
-                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
-            ], 500);
-        }
+        return view('admin.room.participant', compact('peserta', 'room'));
     }
         
     public function getTasks($room_id)
     {
         $room = Room::where('room_id', $room_id)->firstOrFail();
         
-        if ($room->mentor_id !== Auth::user()->mentor->mentor_id) {
-            return response()->json(['error' => 'Unauthorized'], 403);
-        }
+        // Admin bisa akses semua room
         
         $now = now();
         
@@ -177,17 +111,10 @@ class RoomViewController extends Controller
             'is_expired' => $isExpired,
             'submissions' => $task->submissions->map(function($submission) {
                 return [
-                    'submission_id' => $submission->submission_id,
                     'user_id' => $submission->user->id,
                     'user_nama' => $submission->user->nama,
                     'submitted_at' => $submission->created_at->format('d M Y H:i'),
-                    'status' => $submission->status,
-                    'nilai' => $submission->nilai,
-                    'file_path' => $submission->file_path,
-                    'file_name' => $submission->file_path ? basename($submission->file_path) : null,
-                    'link' => $submission->link,
-                    'catatan' => $submission->catatan,
-                    'feedback' => $submission->feedback
+                    'status' => $submission->status
                 ];
             })
         ];
@@ -197,9 +124,7 @@ class RoomViewController extends Controller
     {
         $room = Room::where('room_id', $room_id)->firstOrFail();
         
-        if ($room->mentor_id !== Auth::user()->mentor->mentor_id) {
-            return response()->json(['error' => 'Unauthorized'], 403);
-        }
+        // Admin bisa menambahkan task di semua room
         
         $request->validate([
             'judul' => 'required|string|max:255',
@@ -225,7 +150,7 @@ class RoomViewController extends Controller
             'user_id' => Auth::id(),
             'room_id' => $room_id,
             'type' => 'task_added',
-            'description' => 'New Task: ' . $task->judul,
+            'description' => 'New Task: ' . $task->judul . ' (Added by Admin)',
         ]);
         
         return response()->json([
@@ -239,9 +164,7 @@ class RoomViewController extends Controller
     {
         $room = Room::where('room_id', $room_id)->firstOrFail();
         
-        if ($room->mentor_id !== Auth::user()->mentor->mentor_id) {
-            return response()->json(['error' => 'Unauthorized'], 403);
-        }
+        // Admin bisa update task di semua room
         
         $task = Task::where('task_id', $task_id)
             ->where('room_id', $room_id)
@@ -289,9 +212,7 @@ class RoomViewController extends Controller
     {
         $room = Room::where('room_id', $room_id)->firstOrFail();
         
-        if ($room->mentor_id !== Auth::user()->mentor->mentor_id) {
-            return response()->json(['error' => 'Unauthorized'], 403);
-        }
+        // Admin bisa delete task di semua room
         
         $task = Task::where('task_id', $task_id)
             ->where('room_id', $room_id)
@@ -308,65 +229,5 @@ class RoomViewController extends Controller
             'success' => true,
             'message' => 'Task berhasil dihapus'
         ]);
-    }
-
-    public function downloadSubmission($room_id, $submission_id)
-    {
-        $room = Room::where('room_id', $room_id)->firstOrFail();
-        
-        $user = Auth::user();
-        if (!$user->mentor) {
-            abort(403, 'Data mentor tidak ditemukan');
-        }
-        
-        if ($room->mentor_id !== $user->mentor->mentor_id) {
-            abort(403, 'Anda bukan mentor dari room ini');
-        }
-        
-        // GUNAKAN where() EXPLICIT, jangan findOrFail()
-        $submission = \App\Models\Submission::where('submission_id', $submission_id)
-            ->with('task')
-            ->firstOrFail();
-        
-        \Log::info('Submission found', [
-            'submission_id' => $submission->submission_id,
-            'task_id' => $submission->task_id,
-            'task_room_id' => $submission->task->room_id,
-            'requested_room_id' => $room_id,
-            'file_path' => $submission->file_path
-        ]);
-        
-        // Cast keduanya ke integer
-        if ((int)$submission->task->room_id !== (int)$room_id) {
-            abort(403, 'Submission tidak ada di room ini');
-        }
-        
-        if (!$submission->file_path) {
-            abort(404, 'File tidak ditemukan. Path: null');
-        }
-        
-        // Cek apakah path sudah include 'public/' atau belum
-        $filePath = $submission->file_path;
-        if (!str_starts_with($filePath, 'public/')) {
-            $filePath = 'public/' . $filePath;
-        }
-        
-        \Log::info('File path check', [
-            'original_path' => $submission->file_path,
-            'full_path' => $filePath,
-            'exists' => Storage::exists($filePath)
-        ]);
-        
-        if (!Storage::exists($filePath)) {
-            // Coba tanpa 'public/'
-            $alternativePath = str_replace('public/', '', $filePath);
-            if (Storage::disk('public')->exists($alternativePath)) {
-                return Storage::disk('public')->download($alternativePath);
-            }
-            
-            abort(404, 'File tidak ditemukan di storage. Path: ' . $filePath);
-        }
-        
-        return Storage::download($filePath);
     }
 }

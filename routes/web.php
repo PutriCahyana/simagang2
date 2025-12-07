@@ -3,9 +3,11 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\PesertaController;
 use App\Http\Controllers\Admin\MateriController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\RoomController;
+use App\Http\Controllers\Admin\RoomViewController;
 use App\Http\Controllers\Mentor\RoomViewController as MentorRoomViewController;
 use App\Http\Controllers\Mentor\DashboardController as MentorDashboardController;
 use App\Http\Controllers\Mentor\MateriController as MentorMateriController;
@@ -44,8 +46,16 @@ Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
 // ===== ADMIN ROUTES =====
 Route::middleware(['MidLogin:admin'])->group(function(){
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    // User Management
+
+    Route::get('/admin/period/{periode}', [DashboardController::class, 'getPeriodDetail']);
+    Route::get('/admin/institut/{institut}/{type}', [DashboardController::class, 'getInstitutDetail']);
+    Route::get('/admin/room-detail', [DashboardController::class, 'getRoomDetail']);
+    Route::get('/admin/room/{roomId}/detail', [DashboardController::class, 'getRoomDetailById']);
+    Route::get('/admin/home/peserta/{user_id}', [DashboardController::class, 'showPeserta'])->name('admin.home.peserta');
+
+    // User mentor Management
     Route::get('user', [UserController::class, 'index'])->name('user');
+    Route::delete('/admin/user/{id}', [UserController::class, 'destroy']) ->name('admin.mentor.destroy');
     
     // Materi Management
     Route::get('materi', [MateriController::class, 'index'])->name('materi');
@@ -60,8 +70,31 @@ Route::middleware(['MidLogin:admin'])->group(function(){
     Route::get('room', [RoomController::class, 'index'])->name('room');
     Route::get('room/create', [RoomController::class, 'create'])->name('roomCreate');
     Route::post('room/store', [RoomController::class, 'store'])->name('room.store');
+    Route::get('/admin/room/{room_id}/edit', [RoomController::class, 'edit'])->name('room.edit');
+    Route::put('/admin/room/{room_id}', [RoomController::class, 'update'])->name('room.update');
+    Route::delete('/admin/room/{room_id}', [RoomController::class, 'destroy'])->name('room.destroy');
+
+    //room view
+     Route::get('/admin/room/{room_id}', [RoomViewController::class, 'show'])->name('room.show');
+        
+        // API untuk get data
+        Route::get('/admin/room/{room_id}/participants', [RoomViewController::class, 'getParticipants']);
+        Route::get('/admin/room/{room_id}/tasks', [RoomViewController::class, 'getTasks']);
+        
+        // API untuk create task
+        Route::post('/admin/room/{room_id}/tasks', [RoomViewController::class, 'storeTask']);
+        Route::put('/admin/room/{room_id}/tasks/{task_id}', [RoomViewController::class, 'updateTask']);
+        Route::delete('/admin/room/{room_id}/tasks/{task_id}', [RoomViewController::class, 'deleteTask']);
+        //detail participant
+        Route::get('/admin/room/{room_id}/participant/{user_id}', [RoomViewController::class, 'showParticipant'])->name('room.participant.show');
+
 
     Route::get('/logbook', [AdminLogbookController::class, 'index'])->name('logbook.index');
+
+    //peserta
+    Route::get('admin/peserta', [PesertaController::class, 'index'])->name('admin.peserta.index');
+    Route::get('admin/peserta/{id}', [PesertaController::class, 'show'])->name('admin.peserta.show');
+    Route::delete('admin/peserta/{id}', [PesertaController::class, 'destroy'])->name('admin.peserta.destroy');
 });
 
 // ===== MENTOR ROUTES =====
@@ -73,6 +106,7 @@ Route::middleware(['MidLogin:mentor'])->group(function(){
     Route::get('/mentor/institut/{institut}/{type}', [MentorDashboardController::class, 'getInstitutDetail']);
     Route::get('/mentor/room-detail', [MentorDashboardController::class, 'getRoomDetail']);
     Route::get('/mentor/room/{roomId}/detail', [MentorDashboardController::class, 'getRoomDetailById']);
+    Route::get('mentor/home/peserta/{user_id}', [MentorDashboardController::class, 'showPeserta'])->name('mentor.home.peserta');
 
     // Materi Mentor
     Route::get('mentor/materi', [MentorMateriController::class, 'index'])->name('mentor.materi');
@@ -87,6 +121,7 @@ Route::middleware(['MidLogin:mentor'])->group(function(){
     Route::get('mentor/logbook', [MentorLogbookController::class, 'index'])->name('mentor.logbook.index');
     Route::post('mentor/logbook/{id}/approve', [MentorLogbookController::class, 'toggleApproval'])->name('mentor.logbook.approve');
     Route::put('mentor/logbook/{id}/keterangan', [MentorLogbookController::class, 'updateKeterangan'])->name('mentor.logbook.keterangan');
+    Route::get('mentor/logbook/peserta/{user_id}', [MentorLogbookController::class, 'showPeserta'])->name('mentor.logbook.peserta');
     
     // Profile
     Route::get('/profile', [MentorProfileController::class, 'index'])->name('profile');
@@ -103,16 +138,22 @@ Route::middleware(['MidLogin:mentor'])->group(function(){
         
         // API untuk get data
         Route::get('/room/{room_id}/participants', [MentorRoomViewController::class, 'getParticipants']);
+        Route::post('/room/{room_id}/participant/{user_id}/remove', [MentorRoomViewController::class, 'removeParticipant'])->name('room.participant.remove');
         Route::get('/room/{room_id}/tasks', [MentorRoomViewController::class, 'getTasks']);
         
         // API untuk create task
         Route::post('/room/{room_id}/tasks', [MentorRoomViewController::class, 'storeTask']);
         Route::put('/room/{room_id}/tasks/{task_id}', [MentorRoomViewController::class, 'updateTask']);
         Route::delete('/room/{room_id}/tasks/{task_id}', [MentorRoomViewController::class, 'deleteTask']);
+        //detail participant
+        Route::get('/room/{room_id}/participant/{user_id}', [MentorRoomViewController::class, 'showParticipant'])->name('room.participant.show');
 
         //mentor
         Route::get('/peserta', [MentorPesertaController::class, 'index'])->name('peserta.index');
         Route::get('/peserta/{id}', [MentorPesertaController::class, 'show'])->name('peserta.show');
+
+        //download tugas
+        Route::get('/room/{room_id}/submission/{submission_id}/download', [MentorRoomViewController::class, 'downloadSubmission'])->name('submission.download');
     });
     
     // Peserta Mentor
@@ -122,6 +163,7 @@ Route::middleware(['MidLogin:mentor'])->group(function(){
 // ===== PESERTA ROUTES =====
 Route::middleware(['MidLogin:peserta'])->group(function(){
     Route::get('peserta/dashboard', [PesertaDashboardController::class, 'index'])->name('peserta.dashboard');
+    
     Route::get('peserta/roomlist', [PesertaParticipantRoomController::class, 'index'])->name('peserta.roomlist');
     Route::post('peserta/roomlist/join', [PesertaParticipantRoomController::class, 'join'])->name('peserta.roomlist.join');
     Route::get('/peserta/upcoming-tasks', [PesertaParticipantRoomController::class, 'getUpcomingTasks'])->name('peserta.upcoming-tasks');
@@ -132,6 +174,14 @@ Route::middleware(['MidLogin:peserta'])->group(function(){
     Route::get('peserta/materials/{id}/download', [PesertaMateriController::class, 'download'])->name('peserta.materials.download');
     Route::get('peserta/materials/{id}/view-pdf', [PesertaMateriController::class, 'viewPdf'])->name('peserta.materials.view-pdf');
     Route::get('peserta/materials/{id}/stream', [PesertaMateriController::class, 'stream'])->name('peserta.materials.stream');
+
+    // Room routes
+    Route::get('peserta/room/{room_id}', [PesertaRoomController::class, 'show'])->name('peserta.room.show');
+    Route::get('peserta/room/task/{task_id}/detail', [PesertaRoomController::class, 'getTaskDetail'])->name('peserta.room.task.detail');
+
+    // Submission routes
+    Route::post('peserta/room/task/{task_id}/submit', [App\Http\Controllers\Peserta\SubmissionController::class, 'submit'])->name('peserta.task.submit');
+    Route::get('peserta/submission/{submission_id}/download', [App\Http\Controllers\Peserta\SubmissionController::class, 'download'])->name('peserta.submission.download');
 
     // Logbook
     Route::get('peserta/logbook', [PesertaLogbookController::class, 'index'])->name('peserta.logbook.index');

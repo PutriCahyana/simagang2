@@ -3,71 +3,68 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Peserta;
+use App\Models\User;
+use App\Models\Room;
 use Illuminate\Http\Request;
 
 class PesertaController extends Controller
 {
-    //Read : ambil semua peserta
     public function index()
     {
-        return Peserta::all();
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        $request->validate([
-            'nama' => 'required',
-            'nim' => 'required',
-            'kampus' => 'required',
-            'jurusan' => 'required',                                                                                                                                                                                                                                                                                        
+        // Ambil semua user dengan role peserta
+        $pesertaList = User::where('role', 'peserta')
+            ->with(['peserta', 'joinedRooms'])
+            ->get()
+            ->map(function ($user) {
+                // Ambil semua room yang diikuti peserta
+                $user->all_rooms = $user->joinedRooms;
+                return $user;
+            });
+        
+        // Ambil semua room untuk filter
+        $allRooms = Room::all();
+        
+        return view('admin.peserta.index', [
+            'pesertaList' => $pesertaList,
+            'totalPeserta' => $pesertaList->count(),
+            'totalRooms' => $allRooms->count(),
+            'allRooms' => $allRooms
         ]);
-
-        return Peserta::create($request->all());
+    }
+    
+    public function show($id)
+    {
+        // Ambil peserta berdasarkan id tanpa filter room
+        $peserta = User::where('id', $id)
+            ->where('role', 'peserta')
+            ->with(['peserta', 'joinedRooms'])
+            ->firstOrFail();
+        
+        return view('admin.peserta.show', [
+            'peserta' => $peserta
+        ]);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function destroy($id)
     {
-        return Peserta::findOrFail($id);
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        $peserta = Peserta::findOrFail($id);
-        $peserta->update($request->all());
-        return $peserta;
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        return Peserta::destroy($id);
+        $peserta = User::where('id', $id)
+            ->where('role', 'peserta')
+            ->firstOrFail();
+        
+        $nama = $peserta->nama;
+        
+        // Hapus relasi di pivot table room_user
+        $peserta->joinedRooms()->detach();
+        
+        // Hapus data peserta di tabel peserta
+        if ($peserta->peserta) {
+            $peserta->peserta->delete();
+        }
+        
+        // Hapus user
+        $peserta->delete();
+        
+        return redirect()->route('admin.peserta.index')
+            ->with('success', "Peserta $nama berhasil dihapus dari sistem");
     }
 }

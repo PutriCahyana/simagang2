@@ -140,6 +140,26 @@ class DashboardController extends Controller
             'stats'
         ));
     }
+
+    public function showPeserta($user_id)
+    {
+        // Ambil data peserta dengan relasi yang diperlukan
+        $peserta = \App\Models\User::where('id', $user_id)
+            ->where('role', 'peserta')
+            ->with(['peserta', 'joinedRooms'])
+            ->firstOrFail();
+        
+        // Optional: Validasi bahwa mentor hanya bisa lihat peserta di room mereka
+        $mentorRoomIds = Auth::user()->mentor->rooms->pluck('room_id');
+        $pesertaRoomIds = $peserta->joinedRooms->pluck('room_id');
+        
+        // Cek apakah ada irisan antara room mentor dan room peserta
+        if ($mentorRoomIds->intersect($pesertaRoomIds)->isEmpty()) {
+            abort(403, 'Anda tidak memiliki akses ke peserta ini');
+        }
+        
+        return view('mentor.home.peserta', compact('peserta'));
+    }
     
     // API untuk modal detail peserta per periode
     public function getPeriodDetail($periode)

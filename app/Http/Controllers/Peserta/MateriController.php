@@ -42,7 +42,7 @@ class MateriController extends Controller
         return view('peserta.materials.index', compact('generalMaterials', 'joinedRooms'));
     }
 
-   public function view($id)
+   public function view($id, Request $request)
 {
     $user = Auth::user();
     $peserta = Peserta::where('peserta_id', $user->id)->first();
@@ -60,7 +60,12 @@ class MateriController extends Controller
         }
     }
 
-    return view('peserta.materials.view', compact('materi'));
+      // Ambil info dari query parameter
+    $fromRoom = $request->query('from') === 'room';
+    $backUrl = $request->query('back', route('peserta.materials'));
+
+
+    return view('peserta.materials.view', compact('materi', 'fromRoom', 'backUrl'));
 }
 
     public function download($id)

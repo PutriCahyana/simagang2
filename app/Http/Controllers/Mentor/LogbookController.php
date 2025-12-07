@@ -4,9 +4,10 @@ namespace App\Http\Controllers\Mentor;
 
 use App\Models\Room;
 use App\Models\Logbook;
-use Illuminate\Http\Request;
 
+use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 
 class LogbookController extends Controller
 {
@@ -94,5 +95,25 @@ class LogbookController extends Controller
         ]);
 
         return back()->with('success', 'Keterangan berhasil diupdate!');
+    }
+
+    public function showPeserta($user_id)
+    {
+        // Ambil data peserta dengan relasi yang diperlukan
+        $peserta = \App\Models\User::where('id', $user_id)
+            ->where('role', 'peserta')
+            ->with(['peserta', 'joinedRooms'])
+            ->firstOrFail();
+        
+        // Optional: Validasi bahwa mentor hanya bisa lihat peserta di room mereka
+        $mentorRoomIds = Auth::user()->mentor->rooms->pluck('room_id');
+        $pesertaRoomIds = $peserta->joinedRooms->pluck('room_id');
+        
+        // Cek apakah ada irisan antara room mentor dan room peserta
+        if ($mentorRoomIds->intersect($pesertaRoomIds)->isEmpty()) {
+            abort(403, 'Anda tidak memiliki akses ke peserta ini');
+        }
+        
+        return view('mentor.logbook.peserta', compact('peserta'));
     }
 }

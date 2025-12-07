@@ -37,6 +37,7 @@ class Room extends Model
     {
         return $this->belongsTo(Mentor::class, 'mentor_id', 'mentor_id');
     }
+    
 
     public function users()
     {

@@ -5,10 +5,8 @@
 <div class="container mx-auto px-4 py-8 max-w-4xl">
     {{-- Tombol Kembali --}}
     <div class="mb-6">
-        <a href="{{ route('peserta.materials') }}" 
-           class="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded-lg shadow transition-all duration-200">
-            <i class="fas fa-arrow-left"></i>
-            Kembali
+        <a href="{{ $backUrl ?? route('peserta.materials.index') }}" class="btn btn-primary">
+            <i class="fas fa-arrow-left"></i> Kembali
         </a>
     </div>
 

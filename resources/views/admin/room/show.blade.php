@@ -2,17 +2,50 @@
 
 @section('konten')
 <div class="container-fluid px-4 py-4">
+    <!-- Badge Admin Mode -->
+    <div class="alert alert-info shadow-sm border-0 mb-3">
+        <i class="bi bi-shield-check me-2"></i>
+        <strong>Mode Admin:</strong> Anda dapat mengelola room ini sebagai administrator. 
+        @if($room->mentor)
+            Mentor yang mengelola: <strong>{{ $room->mentor->user->nama }}</strong>
+        @else
+            <strong>Room ini dibuat oleh Admin (General Room)</strong>
+        @endif
+    </div>
+
     <!-- Header Room -->
     <div class="card shadow-sm border-0 mb-4 bg-gradient-primary">
         <div class="card-body p-4">
-            <div class="d-flex align-items-center">
-                <div class="icon-box me-3">
-                    <i class="bi bi-collection-fill"></i>
+            <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+                <!-- Info Room -->
+                <div class="d-flex align-items-center">
+                    <div class="icon-box me-3">
+                        <i class="bi bi-collection-fill"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-white mb-1 fw-bold">{{ $room->nama_room }}</h2>
+                        <p class="text-white-50 mb-0">{{ $room->deskripsi }}</p>
+                    </div>
                 </div>
-                <div>
-                    <h2 class="text-white mb-1 fw-bold">{{ $room->nama_room }}</h2>
-                    <p class="text-white-50 mb-0">{{ $room->deskripsi }}</p>
-                </div>
+                
+                <!-- Info Mentor -->
+                @if($room->mentor)
+                    <div class="mentor-badge bg-white rounded-3 px-4 py-3 shadow-sm">
+                        <small class="text-muted d-block mb-1">Mentor:</small>
+                        <h6 class="text-dark mb-0 fw-bold">
+                            <i class="bi bi-person-badge me-1 text-primary"></i>
+                            {{ $room->mentor->user->nama }}
+                        </h6>
+                    </div>
+                @else
+                    <div class="mentor-badge bg-white rounded-3 px-4 py-3 shadow-sm">
+                        <small class="text-muted d-block mb-1">Dibuat oleh:</small>
+                        <h6 class="text-dark mb-0 fw-bold">
+                            <i class="bi bi-shield-check me-1 text-success"></i>
+                            Admin
+                        </h6>
+                    </div>
+                @endif
             </div>
         </div>
     </div>
@@ -113,7 +146,7 @@
                 <div class="card-body p-3">
                     @if($room->materis->count() > 0)
                         @foreach($room->materis as $materi)
-                        <a href="{{ route('mentor.materiView', $materi->materi_id) }}" class="text-decoration-none">
+                        <a href="{{ route('materiView', $materi->materi_id) }}" class="text-decoration-none">
                             <div class="materi-item p-3 mb-2 rounded-3 bg-light">
                                 <div class="d-flex align-items-center">
                                     <div class="icon-circle bg-info me-3">
@@ -275,16 +308,13 @@
         background-color: #dbeafe;
     }
 
-    .submission-item {
-    background: #f9fafb;
-    transition: all 0.2s ease;
+    /* Mentor Badge */
+    .mentor-badge {
+        border-radius: 16px;
+        background: rgba(255, 255, 255, 0.95) !important;
+        border: 2px solid rgba(255, 255, 255, 0.3);
     }
-
-    .submission-item:hover {
-        background: white;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    }
-        
+    
     /* Card Enhancement */
     .card {
         border-radius: 16px;
@@ -476,124 +506,6 @@
             font-size: 24px;
         }
     }
-    /* Submission Card Styles */
-.submission-card {
-    background: white;
-    border: 1px solid #e5e7eb;
-    border-radius: 12px;
-    padding: 16px;
-    margin-bottom: 12px;
-    transition: all 0.2s ease;
-}
-
-.submission-card:hover {
-    border-color: #6366f1;
-    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.1);
-    transform: translateY(-2px);
-}
-
-.submission-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 12px;
-    gap: 12px;
-}
-
-.submission-avatar {
-    width: 48px;
-    height: 48px;
-    border-radius: 12px;
-    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-weight: 700;
-    font-size: 18px;
-    flex-shrink: 0;
-}
-
-.status-badge {
-    padding: 6px 14px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 600;
-    white-space: nowrap;
-    display: inline-flex;
-    align-items: center;
-}
-
-.status-success {
-    background-color: #d1fae5;
-    color: #065f46;
-}
-
-.status-warning {
-    background-color: #fef3c7;
-    color: #92400e;
-}
-
-.status-info {
-    background-color: #dbeafe;
-    color: #1e40af;
-}
-
-.submission-info {
-    background: #f9fafb;
-    border-radius: 8px;
-    padding: 12px;
-    margin-bottom: 12px;
-}
-
-.info-item {
-    display: flex;
-    align-items: flex-start;
-    margin-bottom: 8px;
-    font-size: 14px;
-}
-
-.info-item:last-child {
-    margin-bottom: 0;
-}
-
-.info-label {
-    font-weight: 600;
-    color: #374151;
-    margin-right: 6px;
-}
-
-.info-value {
-    color: #6b7280;
-    flex: 1;
-}
-
-.submission-action {
-    display: flex;
-    gap: 8px;
-}
-
-.submission-action .btn {
-    flex: 1;
-}
-
-/* Responsive untuk submission */
-@media (max-width: 576px) {
-    .submission-header {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-    
-    .status-badge {
-        align-self: flex-start;
-    }
-    
-    .submission-avatar {
-        width: 40px;
-        height: 40px;
-        font-size: 16px;
-    }
-}
 </style>
 @endpush
 
@@ -615,7 +527,7 @@ $(document).ready(function() {
         const originalText = submitBtn.html();
         
         $.ajax({
-            url: `/mentor/room/${roomId}/tasks`,
+            url: `/admin/room/${roomId}/tasks`,
             method: 'POST',
             data: formData,
             processData: false,
@@ -665,7 +577,7 @@ $(document).ready(function() {
         const originalText = submitBtn.html();
         
         $.ajax({
-            url: `/mentor/room/${roomId}/tasks/${taskId}`,
+            url: `/admin/room/${roomId}/tasks/${taskId}`,
             method: 'POST',
             data: formData,
             processData: false,
@@ -694,7 +606,7 @@ $(document).ready(function() {
     // Load participants
     function loadParticipants() {
         $.ajax({
-            url: `/mentor/room/${roomId}/participants`,
+            url: `/admin/room/${roomId}/participants`,
             method: 'GET',
             success: function(participants) {
                 $('#participantCount').text(participants.length);
@@ -711,7 +623,7 @@ $(document).ready(function() {
                 
                 let html = '';
                 participants.forEach(function(participant) {
-                    const detailUrl = `/mentor/room/${roomId}/participant/${participant.id}`;
+                    const detailUrl = `/admin/room/${roomId}/participant/${participant.id}`;
                     html += `
                         <a href="${detailUrl}" class="text-decoration-none">
                             <div class="participant-item">
@@ -745,7 +657,7 @@ $(document).ready(function() {
     // Load tasks
     function loadTasks() {
         $.ajax({
-            url: `/mentor/room/${roomId}/tasks`,
+            url: `/admin/room/${roomId}/tasks`,
             method: 'GET',
             success: function(response) {
                 // Render active tasks
@@ -834,144 +746,61 @@ $(document).ready(function() {
     }
     
     // View task detail
-    // View task detail
-$(document).on('click', '.view-task', function() {
-    const taskId = $(this).data('task-id');
-    
-    $.ajax({
-        url: `/mentor/room/${roomId}/tasks`,
-        method: 'GET',
-        success: function(response) {
-            const allTasks = [...response.active, ...response.expired];
-            const task = allTasks.find(t => t.id === taskId);
-            
-            if (task) {
-                $('#taskDetailJudul').text(task.judul);
-                $('#taskDetailDeskripsi').text(task.deskripsi);
-                $('#taskDetailDeadline').text(task.deadline);
-                $('#submissionCount').text(task.total_submissions);
+    $(document).on('click', '.view-task', function() {
+        const taskId = $(this).data('task-id');
+        
+        $.ajax({
+            url: `/admin/room/${roomId}/tasks`,
+            method: 'GET',
+            success: function(response) {
+                const allTasks = [...response.active, ...response.expired];
+                const task = allTasks.find(t => t.id === taskId);
                 
-                // Show file if exists
-                if (task.file_path) {
-                    $('#taskDetailFile').attr('href', `/storage/${task.file_path}`);
-                    $('#taskDetailFileContainer').show();
-                } else {
-                    $('#taskDetailFileContainer').hide();
-                }
-                
-                // Render submissions dengan tampilan baru
-                if (task.submissions.length === 0) {
-                    $('#submissionList').html(`
-                        <div class="text-center py-4">
-                            <i class="bi bi-inbox display-5 text-muted opacity-25"></i>
-                            <p class="text-muted mt-3 mb-0">Belum ada yang mengumpulkan</p>
-                        </div>
-                    `);
-                } else {
-                    let submissionHtml = '';
-                    task.submissions.forEach(function(submission) {
-                        const statusConfig = {
-                            'graded': { color: 'success', icon: 'check-circle-fill', text: 'Dinilai' },
-                            'late': { color: 'warning', icon: 'clock-fill', text: 'Terlambat' },
-                            'pending': { color: 'info', icon: 'hourglass-split', text: 'Pending' }
-                        };
-                        
-                        const status = statusConfig[submission.status] || statusConfig['pending'];
-                        
-                        // Tombol download atau link
-                        let actionButton = '';
-                        if (submission.file_path) {
-                            actionButton = `
-                                <a href="/mentor/room/${roomId}/submission/${submission.submission_id}/download" 
-                                   class="btn btn-sm btn-primary" 
-                                   target="_blank">
-                                    <i class="bi bi-download me-1"></i>Download File
-                                </a>
-                            `;
-                        } else if (submission.link) {
-                            actionButton = `
-                                <a href="${submission.link}" 
-                                   class="btn btn-sm btn-primary" 
-                                   target="_blank" 
-                                   rel="noopener">
-                                    <i class="bi bi-link-45deg me-1"></i>Buka Link
-                                </a>
-                            `;
-                        }
-                        
-                        // Info sections
-                        let infoSections = '';
-                        
-                        if (submission.catatan) {
-                            infoSections += `
-                                <div class="info-item">
-                                    <i class="bi bi-chat-left-text text-primary me-2"></i>
-                                    <span class="info-label">Catatan:</span>
-                                    <span class="info-value">${submission.catatan}</span>
-                                </div>
-                            `;
-                        }
-                        
-                        if (submission.nilai) {
-                            infoSections += `
-                                <div class="info-item">
-                                    <i class="bi bi-star-fill text-warning me-2"></i>
-                                    <span class="info-label">Nilai:</span>
-                                    <span class="info-value fw-bold text-success">${submission.nilai}</span>
-                                </div>
-                            `;
-                        }
-                        
-                        if (submission.feedback) {
-                            infoSections += `
-                                <div class="info-item">
-                                    <i class="bi bi-chat-square-quote text-info me-2"></i>
-                                    <span class="info-label">Feedback:</span>
-                                    <span class="info-value">${submission.feedback}</span>
-                                </div>
-                            `;
-                        }
-                        
-                        submissionHtml += `
-                            <div class="submission-card">
-                                <div class="submission-header">
-                                    <div class="d-flex align-items-center gap-3 flex-grow-1">
-                                        <div class="submission-avatar">
-                                            ${submission.user_nama.charAt(0).toUpperCase()}
-                                        </div>
-                                        <div>
-                                            <h6 class="mb-1 fw-bold text-dark">${submission.user_nama}</h6>
-                                            <small class="text-muted">
-                                                <i class="bi bi-clock me-1"></i>${submission.submitted_at}
-                                            </small>
-                                        </div>
+                if (task) {
+                    $('#taskDetailJudul').text(task.judul);
+                    $('#taskDetailDeskripsi').text(task.deskripsi);
+                    $('#taskDetailDeadline').text(task.deadline);
+                    $('#submissionCount').text(task.total_submissions);
+                    
+                    // Show file if exists
+                    if (task.file_path) {
+                        $('#taskDetailFile').attr('href', `/storage/${task.file_path}`);
+                        $('#taskDetailFileContainer').show();
+                    } else {
+                        $('#taskDetailFileContainer').hide();
+                    }
+                    
+                    if (task.submissions.length === 0) {
+                        $('#submissionList').html('<p class="text-muted mb-0">Belum ada yang mengumpulkan</p>');
+                    } else {
+                        let submissionHtml = '';
+                        task.submissions.forEach(function(submission) {
+                            const statusClass = submission.status === 'graded' ? 'success' : 'warning';
+                            submissionHtml += `
+                                <div class="submission-item">
+                                    <div>
+                                        <h6 class="mb-0 fw-semibold">${submission.user_nama}</h6>
+                                        <small class="text-muted">${submission.submitted_at}</small>
                                     </div>
-                                    <span class="status-badge status-${status.color}">
-                                        <i class="bi bi-${status.icon} me-1"></i>${status.text}
-                                    </span>
+                                    <span class="badge bg-${statusClass}">${submission.status}</span>
                                 </div>
-                                
-                                ${infoSections ? `<div class="submission-info">${infoSections}</div>` : ''}
-                                
-                                ${actionButton ? `<div class="submission-action">${actionButton}</div>` : ''}
-                            </div>
-                        `;
-                    });
-                    $('#submissionList').html(submissionHtml);
+                            `;
+                        });
+                        $('#submissionList').html(submissionHtml);
+                    }
+                    
+                    $('#taskDetailModal').modal('show');
                 }
-                
-                $('#taskDetailModal').modal('show');
             }
-        }
+        });
     });
-});
     
     // Edit task
     $(document).on('click', '.edit-task', function() {
         const taskId = $(this).data('task-id');
         
         $.ajax({
-            url: `/mentor/room/${roomId}/tasks`,
+            url: `/admin/room/${roomId}/tasks`,
             method: 'GET',
             success: function(response) {
                 const allTasks = [...response.active, ...response.expired];
@@ -1016,7 +845,7 @@ $(document).on('click', '.view-task', function() {
         }
         
         $.ajax({
-            url: `/mentor/room/${roomId}/tasks/${taskId}`,
+            url: `/admin/room/${roomId}/tasks/${taskId}`,
             method: 'DELETE',
             data: {
                 _token: '{{ csrf_token() }}'

@@ -14,6 +14,9 @@
                 
                 <!-- Include modal create -->
                 @include('admin.room.create')
+
+                <!-- Include modal edit -->
+                @include('admin.room.edit')
         </div>
         <div class="card-body">
                 <div class="table-responsive">
@@ -53,20 +56,29 @@
 
 
 
-                   <td class="text-center">
-                       <a href="#" class="btn btn-success btn-sm">
-                           <i class="fas fa-eye"></i>
-                       </a>
-                       <a href="#" class="btn btn-warning btn-sm">
-                           <i class="fas fa-edit"></i>
-                       </a>
-                       <form action="#" method="POST" style="display: inline-block;" 
-                      onsubmit="return confirm('Yakin ingin hapus room ini?')">
-                    @csrf
-                    @method('DELETE')
-                    <button type="submit" class="btn btn-danger btn-sm" title="Hapus">
-                        <i class="fas fa-trash"></i>
-                   </td>
+               <td class="text-center">
+                    <a href="{{ route('room.show', $room->room_id) }}" class="btn btn-success btn-sm" title="Lihat">
+                        <i class="fas fa-eye"></i>
+                    </a>
+                    <button type="button" 
+                            class="btn btn-warning btn-sm" 
+                            data-toggle="modal" 
+                            data-target="#editRoomModal"
+                            data-id="{{ $room->room_id }}" 
+                            data-nama="{{ $room->nama_room }}" 
+                            data-deskripsi="{{ $room->deskripsi ?? '' }}"
+                            title="Edit">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <form action="{{ route('room.destroy', $room->room_id) }}" method="POST" style="display: inline-block;" 
+                        onsubmit="return confirm('Yakin ingin hapus room ini?')">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="btn btn-danger btn-sm" title="Hapus">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </form>
+                </td>
                 </tr>
                 @empty
                 <tr>
@@ -82,8 +94,38 @@
                 @endforelse
             </tbody>
         </table>
-                            </div>
+        </div>
         </div>
     </div>
 
 @endsection
+
+@push('scripts')
+<script>
+// Copy code function
+function copyCode(roomId) {
+    const codeElement = document.getElementById('code-' + roomId);
+    const code = codeElement.innerText;
+    
+    navigator.clipboard.writeText(code).then(function() {
+        alert('Kode berhasil disalin: ' + code);
+    });
+}
+
+// Edit room modal handler
+$('#editRoomModal').on('show.bs.modal', function (event) {
+    const button = $(event.relatedTarget);
+    const roomId = button.data('id');
+    const roomNama = button.data('nama');
+    const roomDeskripsi = button.data('deskripsi');
+    
+    // Update form action
+    $('#editRoomForm').attr('action', '/admin/room/' + roomId);
+    
+    // Fill form fields
+    $('#edit_room_id').val(roomId);
+    $('#edit_nama_room').val(roomNama);
+    $('#edit_deskripsi').val(roomDeskripsi || '');
+});
+</script>
+@endpush
