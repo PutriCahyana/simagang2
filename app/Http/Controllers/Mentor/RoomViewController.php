@@ -73,60 +73,60 @@ class RoomViewController extends Controller
         return view('mentor.room.participant', compact('peserta', 'room'));
     }
 
-    public function removeParticipant(Request $request, $room_id, $user_id)
-    {
-        try {
-            $room = Room::where('room_id', $room_id)->firstOrFail();
-            
-            // Pastikan yang akses adalah mentor dari room ini
-            $user = Auth::user();
-            if (!$user->mentor || $room->mentor_id !== $user->mentor->mentor_id) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Anda tidak memiliki akses untuk mengeluarkan peserta dari room ini'
-                ], 403);
-            }
-            
-            // Cek apakah peserta ada di room ini
-            $participant = \App\Models\User::whereHas('joinedRooms', function ($query) use ($room_id) {
-                    $query->where('room.room_id', $room_id);
-                })
-                ->where('id', $user_id)
-                ->where('role', 'peserta')
-                ->first();
-            
-            if (!$participant) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Peserta tidak ditemukan di room ini'
-                ], 404);
-            }
-            
-            // Hapus peserta dari room (detach dari pivot table)
-            $room->users()->detach($user_id);
-            
-            // Log activity
-            Activity::create([
-                'user_id' => Auth::id(),
-                'room_id' => $room_id,
-                'type' => 'participant_removed',
-                'description' => 'Removed participant: ' . $participant->nama,
-            ]);
-            
-            return response()->json([
-                'success' => true,
-                'message' => 'Peserta berhasil dikeluarkan dari room',
-                'redirect' => route('mentor.room.show', $room_id)
-            ], 200);
-            
-        } catch (\Exception $e) {
-            \Log::error('Error removing participant: ' . $e->getMessage());
+   public function removeParticipant(Request $request, $room_id, $user_id)
+{
+    try {
+        $room = Room::where('room_id', $room_id)->firstOrFail();
+        
+        // Pastikan yang akses adalah mentor dari room ini
+        $user = Auth::user();
+        if (!$user->mentor || $room->mentor_id !== $user->mentor->mentor_id) {
             return response()->json([
                 'success' => false,
-                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
-            ], 500);
+                'message' => 'Anda tidak memiliki akses untuk mengeluarkan peserta dari room ini'
+            ], 403);
         }
+        
+        // Cek apakah peserta ada di room ini
+        $participant = \App\Models\User::whereHas('joinedRooms', function ($query) use ($room_id) {
+                $query->where('room.room_id', $room_id);
+            })
+            ->where('id', $user_id)
+            ->where('role', 'peserta')
+            ->first();
+        
+        if (!$participant) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Peserta tidak ditemukan di room ini'
+            ], 404);
+        }
+        
+        // Hapus peserta dari room (detach dari pivot table)
+        $room->users()->detach($user_id);
+        
+        // Log activity - UBAH INI: ganti 'participant_removed' dengan nilai yang lebih pendek
+        Activity::create([
+            'user_id' => Auth::id(),
+            'room_id' => $room_id,
+            'type' => 'removed', // ← UBAH JADI INI (lebih pendek)
+            'description' => 'Removed participant: ' . $participant->nama,
+        ]);
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'Peserta berhasil dikeluarkan dari room',
+            'redirect' => route('mentor.room.show', $room_id)
+        ], 200);
+        
+    } catch (\Exception $e) {
+        \Log::error('Error removing participant: ' . $e->getMessage());
+        return response()->json([
+            'success' => false,
+            'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+        ], 500);
     }
+}
         
     public function getTasks($room_id)
     {

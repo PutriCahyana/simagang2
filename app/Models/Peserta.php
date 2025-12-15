@@ -9,15 +9,24 @@ class Peserta extends Model
 {
     use HasFactory;
 
-    protected $table = 'peserta'; // nama tabel
+    protected $table = 'peserta';
+    
     protected $fillable = [
         'peserta_id',
+        'nim',
         'institut',
+        'fungsi',
+        'email',
         'periode_start',
         'periode_end',
     ];
 
-    // relasi ke User
+    protected $casts = [
+        'periode_start' => 'date',
+        'periode_end' => 'date',
+    ];
+
+    // Relasi ke User
     public function user()
     {
         return $this->belongsTo(User::class, 'peserta_id', 'id');

@@ -21,12 +21,10 @@ class RoomController extends Controller
             abort(403, 'Data peserta tidak ditemukan.');
         }
 
-        // Ambil data room dengan relasi
         $room = Room::with(['mentor.user', 'tasks.submissions' => function($query) use ($user) {
-            $query->where('user_id', $user->id);  // Gunakan user_id
+            $query->where('user_id', $user->id);
         }, 'materis'])->findOrFail($room_id);
 
-        // Cek apakah peserta memiliki akses ke room ini
         $hasAccess = $room->peserta()
             ->where('users.id', $peserta->peserta_id)
             ->exists();
@@ -35,12 +33,10 @@ class RoomController extends Controller
             abort(403, 'Anda tidak memiliki akses ke room ini. Silakan join room terlebih dahulu.');
         }
 
-        // Ambil semua tugas dengan status submission peserta
         $tasks = $room->tasks()->with(['submissions' => function($query) use ($user) {
-            $query->where('user_id', $user->id);  // Gunakan user_id
+            $query->where('user_id', $user->id);
         }])->orderBy('deadline', 'asc')->get();
 
-        // Mapping tugas dengan status
         $tugasList = $tasks->map(function($task) use ($user) {
             $submission = $task->submissions->first();
             
@@ -63,9 +59,7 @@ class RoomController extends Controller
             ];
         });
 
-        // Ambil materi yang berelasi dengan room
         $materiList = $room->materis()->orderBy('created_at', 'desc')->get()->map(function($materi) {
-            // Deteksi tipe berdasarkan konten atau file
             $tipe = 'artikel';
             if (filter_var($materi->konten, FILTER_VALIDATE_URL)) {
                 if (strpos($materi->konten, 'youtube.com') !== false || strpos($materi->konten, 'youtu.be') !== false) {
@@ -87,12 +81,18 @@ class RoomController extends Controller
                 'judul' => $materi->judul,
                 'deskripsi' => $materi->deskripsi,
                 'tipe' => $tipe,
-                'durasi' => '30 menit', // Bisa dikustomisasi jika ada field durasi
+                'durasi' => '30 menit',
                 'url' => route('peserta.materials.view', $materi->materi_id)
             ];
         });
 
-        return view('peserta.room.show', compact('room', 'tugasList', 'materiList'));
+        $pengumumanList = \App\Models\Pengumuman::where('room_id', $room_id)
+            ->aktif()
+            ->orderByDesc('is_penting')
+            ->latest()
+            ->get();
+
+        return view('peserta.room.show', compact('room', 'tugasList', 'materiList', 'pengumumanList'));
     }
 
     public function getTaskDetail($task_id)
@@ -101,10 +101,9 @@ class RoomController extends Controller
         $peserta = Peserta::where('peserta_id', $user->id)->first();
 
         $task = Task::with(['room', 'submissions' => function($query) use ($user) {
-            $query->where('user_id', $user->id);  // Gunakan user_id
+            $query->where('user_id', $user->id);
         }])->findOrFail($task_id);
 
-        // Cek akses
         $hasAccess = $task->room->peserta()
             ->where('users.id', $peserta->peserta_id)
             ->exists();
@@ -128,6 +127,11 @@ class RoomController extends Controller
             'deskripsi' => $task->deskripsi,
             'deadline' => $task->deadline->format('Y-m-d'),
             'status' => $status,
+            // ✅ TAMBAHKAN INI: File tugas dari mentor
+            'task_file_path' => $task->file_path,
+            'task_file_url' => $task->file_path ? asset('storage/' . $task->file_path) : null,
+            'task_file_name' => $task->file_path ? basename($task->file_path) : null,
+            // Data submission peserta
             'submitted_at' => $submission ? $submission->created_at->format('Y-m-d H:i:s') : null,
             'grade' => $submission ? $submission->nilai : null,
             'submission_file' => $submission ? $submission->file_path : null,

@@ -30,7 +30,7 @@
                 <div class="card-body text-center">
                     <div class="fs-1 mb-2">📝</div>
                     <h5 class="card-title">Logbook</h5>
-                    <h3 class="mb-0">{{ $totalLogbooks }}/{{ $workDays }}</h3>
+                    <h3 class="mb-0">{{ $totalLogbooks }}/{{ $totalWorkDays }}</h3>
                     <small class="text-muted">Hari Terisi</small>
                 </div>
             </div>
@@ -51,7 +51,7 @@
                     <div class="fs-1 mb-2">📅</div>
                     <h5 class="card-title">Kehadiran</h5>
                     <h3 class="mb-0 text-success">{{ $attendancePercentage }}%</h3>
-                    <small class="text-muted">{{ $attendanceDays }}/{{ $workDays }} Hari</small>
+                    <small class="text-muted">{{ $attendanceDays }}/{{ $totalWorkDays }} Hari</small>
                 </div>
             </div>
         </div>
@@ -206,31 +206,56 @@
                 </div>
             </div>
 
-            <!-- Announcements Card -->
+           <!-- Announcements Card -->
             <div class="card shadow-sm">
-                <div class="card-header bg-white">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">📢 Pengumuman {{ $room ? $room->nama_room : '' }}</h5>
+                    @if($room)
+                        <a href="{{ route('peserta.room.show', $room->room_id) }}#pengumuman" class="btn btn-sm btn-outline-primary">Lihat Semua</a>
+                    @endif
                 </div>
                 <div class="card-body">
                     @if($announcements->count() > 0)
                         @foreach($announcements as $announcement)
                             <div class="mb-3 pb-3 {{ !$loop->last ? 'border-bottom' : '' }}">
                                 <div class="d-flex align-items-start">
-                                    <span class="me-2">📌</span>
-                                    <div>
-                                        <strong class="d-block">{{ $announcement->description }}</strong>
-                                        <small class="text-muted">{{ $announcement->created_at->diffForHumans() }}</small>
+                                    <span class="me-2">
+                                        @if($announcement->is_penting) 🔴 @else 📌 @endif
+                                    </span>
+                                    <div class="flex-grow-1">
+                                        <div class="d-flex justify-content-between align-items-start mb-1">
+                                            <strong class="d-block">{{ $announcement->judul }}</strong>
+                                            @if($announcement->is_penting)
+                                                <span class="badge bg-danger rounded-pill" style="font-weight: 600; padding: 0.3em 0.7em;">PENTING</span>
+                                            @endif
+                                        </div>
+                                        <p class="small text-muted mb-1">{{ Str::limit($announcement->isi, 100) }}</p>
+                                        <small class="text-muted">
+                                            <i class="bi bi-clock"></i> {{ $announcement->created_at->diffForHumans() }}
+                                            · Berlaku hingga {{ $announcement->tanggal_kadaluarsa->format('d M Y') }}
+                                        </small>
                                     </div>
                                 </div>
                             </div>
                         @endforeach
+                        
+                        @if($room)
+                            <div class="text-center mt-3">
+                                <a href="{{ route('peserta.room.show', $room->room_id) }}#pengumuman" class="btn btn-sm btn-outline-secondary">Lihat Semua Pengumuman →</a>
+                            </div>
+                        @endif
                     @else
                         <div class="text-center py-3">
+                            <div class="fs-1 mb-2">📭</div>
                             <p class="text-muted mb-0 small">Belum ada pengumuman</p>
+                            @if($room)
+                                <a href="{{ route('peserta.room.show', $room->room_id) }}#pengumuman" class="btn btn-sm btn-outline-secondary mt-2">Cek Halaman Room</a>
+                            @endif
                         </div>
                     @endif
                 </div>
             </div>
+
         </div>
     </div>
 </div>

@@ -10,7 +10,7 @@
                     <i class="fas fa-book-reader"></i>
                     My Rooms
                 </h1>
-                <button class="btn btn-primary" data-toggle="modal" data-target="#joinRoomModal">
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#joinRoomModal">
                     <i class="fas fa-plus mr-2"></i>
                     Join Room
                 </button>
@@ -84,7 +84,7 @@
                         </div>
                         <h5 class="text-gray-700 mb-2">Kamu belum join room apapun</h5>
                         <p class="text-muted mb-4">Masukkan kode room untuk bergabung dengan kelas</p>
-                        <button class="btn btn-primary" data-toggle="modal" data-target="#joinRoomModal">
+                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#joinRoomModal">
                             <i class="fas fa-plus mr-2"></i>
                             Join Room Sekarang
                         </button>

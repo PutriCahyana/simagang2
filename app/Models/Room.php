@@ -73,4 +73,15 @@ class Room extends Model
     {
         return $this->tasks()->count();
     }
+    
+    public function pengumuman()
+    {
+        return $this->hasMany(Pengumuman::class, 'room_id', 'room_id');
+    }
+
+    // Helper: get pengumuman aktif
+    public function getPengumumanAktif()
+    {
+        return $this->pengumuman()->aktif()->orderByDesc('is_penting')->latest()->get();
+    }
 }

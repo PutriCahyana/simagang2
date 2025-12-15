@@ -1,26 +1,29 @@
 <?php
 
+use App\Models\Pengumuman;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\Admin\UserController;
-use App\Http\Controllers\Admin\PesertaController;
-use App\Http\Controllers\Admin\MateriController;
-use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\RoomController;
+use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\MateriController;
+use App\Http\Controllers\Admin\PesertaController;
 use App\Http\Controllers\Admin\RoomViewController;
-use App\Http\Controllers\Mentor\RoomViewController as MentorRoomViewController;
-use App\Http\Controllers\Mentor\DashboardController as MentorDashboardController;
-use App\Http\Controllers\Mentor\MateriController as MentorMateriController;
-use App\Http\Controllers\Mentor\PesertaController as MentorPesertaController;
-use App\Http\Controllers\Mentor\RoomController as MentorRoomController;
+use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Mentor\PengumumanController;
 use App\Http\Controllers\Peserta\PesertaDashboardController;
+use App\Http\Controllers\Mentor\RoomController as MentorRoomController;
 use App\Http\Controllers\Peserta\RoomController as PesertaRoomController;
-use App\Http\Controllers\Peserta\ParticipantRoomController as PesertaParticipantRoomController;
-use App\Http\Controllers\Peserta\MateriController as PesertaMateriController;
-use App\Http\Controllers\Peserta\LogbookController as PesertaLogbookController;
-use App\Http\Controllers\Mentor\LogbookController as MentorLogbookController;
-use App\Http\Controllers\Mentor\ProfileController as MentorProfileController;
 use App\Http\Controllers\Admin\LogbookController as AdminLogbookController;
+use App\Http\Controllers\Mentor\MateriController as MentorMateriController;
+use App\Http\Controllers\Mentor\LogbookController as MentorLogbookController;
+use App\Http\Controllers\Mentor\PesertaController as MentorPesertaController;
+use App\Http\Controllers\Mentor\ProfileController as MentorProfileController;
+use App\Http\Controllers\Peserta\MateriController as PesertaMateriController;
+use App\Http\Controllers\Mentor\RoomViewController as MentorRoomViewController;
+use App\Http\Controllers\Peserta\LogbookController as PesertaLogbookController;
+use App\Http\Controllers\Peserta\ProfileController as PesertaProfileController;
+use App\Http\Controllers\Mentor\DashboardController as MentorDashboardController;
+use App\Http\Controllers\Peserta\ParticipantRoomController as PesertaParticipantRoomController;
 
 // ===== PUBLIC ROUTES =====
 Route::get('/', function(){
@@ -65,6 +68,7 @@ Route::middleware(['MidLogin:admin'])->group(function(){
     Route::get('/materi/edit/{id}', [MateriController::class, 'edit'])->name('materiEdit');
     Route::put('/materi/update/{id}', [MateriController::class, 'update'])->name('materiUpdate');
     Route::delete('/materi/destroy/{id}', [MateriController::class, 'destroy'])->name('materiDestroy');
+    Route::get('/materi/download/{id}', [MateriController::class, 'downloadFile'])->name('materiDownload');
     
     // Room Management
     Route::get('room', [RoomController::class, 'index'])->name('room');
@@ -116,22 +120,31 @@ Route::middleware(['MidLogin:mentor'])->group(function(){
     Route::get('mentor/materi/edit/{id}', [MentorMateriController::class, 'edit'])->name('mentor.materiEdit');
     Route::put('mentor/materi/update/{id}', [MentorMateriController::class, 'update'])->name('mentor.materiUpdate');
     Route::delete('mentor/materi/destroy/{id}', [MentorMateriController::class, 'destroy'])->name('mentor.materiDestroy');
+    Route::get('mentor/materi/download/{id}', [MentorMateriController::class, 'downloadFile'])->name('mentor.materiDownload');
 
-    // Logbook
+    // Logbook Mentor
     Route::get('mentor/logbook', [MentorLogbookController::class, 'index'])->name('mentor.logbook.index');
-    Route::post('mentor/logbook/{id}/approve', [MentorLogbookController::class, 'toggleApproval'])->name('mentor.logbook.approve');
-    Route::put('mentor/logbook/{id}/keterangan', [MentorLogbookController::class, 'updateKeterangan'])->name('mentor.logbook.keterangan');
+    Route::post('mentor/logbook/{id}/approve', [MentorLogbookController::class, 'approve'])->name('mentor.logbook.approve');
+    Route::post('mentor/logbook/{id}/approve-keterangan', [MentorLogbookController::class, 'approveWithKeterangan'])->name('mentor.logbook.approve-keterangan');
+    Route::post('mentor/logbook/{id}/unapprove', [MentorLogbookController::class, 'unapprove'])->name('mentor.logbook.unapprove');
     Route::get('mentor/logbook/peserta/{user_id}', [MentorLogbookController::class, 'showPeserta'])->name('mentor.logbook.peserta');
-    
+
     // Profile
-    Route::get('/profile', [MentorProfileController::class, 'index'])->name('profile');
-    Route::put('/profile', [MentorProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile/signature', [MentorProfileController::class, 'deleteSignature'])->name('profile.signature.delete');
+    Route::get('mentor/profile', [MentorProfileController::class, 'index'])->name('mentor.profile');
+    Route::post('mentor/profile/update-data-diri', [MentorProfileController::class, 'updateDataDiri'])->name('mentor.profile.update-data-diri');
+    Route::post('mentor/profile/update-username', [MentorProfileController::class, 'updateUsername'])->name('mentor.profile.update-username');
+    Route::post('mentor/profile/update-password', [MentorProfileController::class, 'updatePassword'])->name('mentor.profile.update-password');
+    Route::post('mentor/profile/update-foto', [MentorProfileController::class, 'updateFotoProfil'])->name('mentor.profile.update-foto');
+    Route::delete('mentor/profile/delete-foto', [MentorProfileController::class, 'deleteFotoProfil'])->name('mentor.profile.delete-foto');
     
     // Room Mentor
     Route::get('mentor/room', [MentorRoomController::class, 'index'])->name('mentor.room');
     Route::get('mentor/room/create', [MentorRoomController::class, 'create'])->name('mentor.roomCreate');
     Route::post('mentor/room/store', [MentorRoomController::class, 'store'])->name('mentor.roomStore');
+    Route::delete('mentor/room/{id}', [MentorRoomController::class, 'destroy'])->name('mentor.room.destroy');
+    // Route untuk mentor room
+    Route::get('/mentor/room/{id}/edit', [MentorRoomController::class, 'edit'])->name('mentor.room.edit');
+    Route::put('/mentor/room/{id}', [MentorRoomController::class, 'update'])->name('mentor.room.update');
 
     Route::prefix('mentor')->name('mentor.')->group(function () {
         Route::get('/room/{room_id}', [MentorRoomViewController::class, 'show'])->name('room.show');
@@ -145,6 +158,12 @@ Route::middleware(['MidLogin:mentor'])->group(function(){
         Route::post('/room/{room_id}/tasks', [MentorRoomViewController::class, 'storeTask']);
         Route::put('/room/{room_id}/tasks/{task_id}', [MentorRoomViewController::class, 'updateTask']);
         Route::delete('/room/{room_id}/tasks/{task_id}', [MentorRoomViewController::class, 'deleteTask']);
+
+        // untuk pengumuman
+        Route::get('/room/{room_id}/pengumuman', [PengumumanController::class, 'index']);
+        Route::post('/room/{room_id}/pengumuman', [PengumumanController::class, 'store']);
+        Route::put('/room/{room_id}/pengumuman/{pengumuman_id}', [PengumumanController::class, 'update']); // TAMBAHKAN INI
+        Route::delete('/room/{room_id}/pengumuman/{pengumuman_id}', [PengumumanController::class, 'destroy']); // TAMBAHKAN INI
         //detail participant
         Route::get('/room/{room_id}/participant/{user_id}', [MentorRoomViewController::class, 'showParticipant'])->name('room.participant.show');
 
@@ -163,6 +182,12 @@ Route::middleware(['MidLogin:mentor'])->group(function(){
 // ===== PESERTA ROUTES =====
 Route::middleware(['MidLogin:peserta'])->group(function(){
     Route::get('peserta/dashboard', [PesertaDashboardController::class, 'index'])->name('peserta.dashboard');
+    Route::get('peserta/profile', [PesertaProfileController::class, 'index'])->name('peserta.profile.index');
+    Route::post('peserta/profile/update-data-diri', [PesertaProfileController::class, 'updateDataDiri'])->name('peserta.profile.update-data-diri');
+    Route::post('peserta/profile/update-username', [PesertaProfileController::class, 'updateUsername'])->name('peserta.profile.update-username');
+    Route::post('peserta/profile/update-password', [PesertaProfileController::class, 'updatePassword'])->name('peserta.profile.update-password');
+    Route::post('peserta/profile/update-foto', [PesertaProfileController::class, 'updateFotoProfil'])->name('peserta.profile.update-foto');
+    Route::delete('peserta/profile/delete-foto', [PesertaProfileController::class, 'deleteFotoProfil'])->name('peserta.profile.delete-foto');
     
     Route::get('peserta/roomlist', [PesertaParticipantRoomController::class, 'index'])->name('peserta.roomlist');
     Route::post('peserta/roomlist/join', [PesertaParticipantRoomController::class, 'join'])->name('peserta.roomlist.join');

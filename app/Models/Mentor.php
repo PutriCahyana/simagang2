@@ -15,9 +15,22 @@ class Mentor extends Model
     protected $fillable = [
         'mentor_id',
         'handphone',
+        'fungsi',
         'signature_path',
     ];
     
+    // Accessor untuk nomor_hp (alias dari handphone)
+    public function getNomorHpAttribute()
+    {
+        return $this->handphone;
+    }
+    
+    // Mutator untuk nomor_hp (alias dari handphone)
+    public function setNomorHpAttribute($value)
+    {
+        $this->attributes['handphone'] = $value;
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class, 'mentor_id', 'id');
@@ -26,6 +39,11 @@ class Mentor extends Model
     public function rooms()
     {
         return $this->hasMany(Room::class, 'mentor_id', 'mentor_id');
+    }
+
+    public function pengumuman()
+    {
+        return $this->hasMany(Pengumuman::class, 'mentor_id', 'mentor_id');
     }
 
 }

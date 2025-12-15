@@ -18,6 +18,7 @@ class Logbook extends Model
         'jam_keluar',
         'aktivitas',
         'keterangan',
+        'keterangan_asli',  // ← TAMBAHKAN INI
         'is_approved',
         'approved_by',
         'approved_at',
@@ -34,7 +35,7 @@ class Logbook extends Model
      */
     public function user()
     {
-        return $this->belongsTo(User::class, 'user_id');
+        return $this->belongsTo(User::class, 'user_id', 'id');
     }
 
     /**

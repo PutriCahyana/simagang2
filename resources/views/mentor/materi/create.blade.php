@@ -12,7 +12,7 @@
                 Back</a>
         </div>
         <div class="card-body">
-            <form action="{{ route('mentor.materiStore') }}" method="post">
+            <form action="{{ route('mentor.materiStore') }}" method="post" enctype="multipart/form-data">
                 @csrf
             <div class="row mb-3">
                 <div class="col-xl-4">
@@ -50,13 +50,33 @@
 
             <div class="row mb-3">
                 <div class="col-12">
-                    <label class="form-label">Konten</label>
+                    <label class="form-label"> <span class="text-danger">*</span> Konten</label>
                     <textarea name="konten" id="editor" class="form-control @error('konten') is-invalid @enderror">{{ old('konten') }}</textarea>
                     @error('konten')
                     <small class="text-danger">
                         {{ $message }}
                     </small>
                     @enderror
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-12">
+                    <label class="form-label">File Lampiran (Opsional)</label>
+                    <div class="custom-file">
+                        <input type="file" class="custom-file-input @error('file') is-invalid @enderror" 
+                               id="file" name="file" 
+                               accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.jpg,.jpeg,.png,.gif,.mp4,.avi,.mov,.zip,.rar">
+                        <label class="custom-file-label" for="file">Pilih file...</label>
+                        @error('file')
+                            <div class="invalid-feedback d-block">{{ $message }}</div>
+                        @enderror
+                    </div>
+                    <small class="form-text text-muted">
+                        <i class="fas fa-info-circle"></i> 
+                        Format yang didukung: PDF, Word, Excel, PowerPoint, Gambar (JPG, PNG, GIF), Video (MP4, AVI, MOV), Archive (ZIP, RAR). 
+                        Maksimal 10MB.
+                    </small>
                 </div>
             </div>
 
@@ -140,6 +160,13 @@
         document.getElementById('previewContent').innerHTML = content;
         $('#previewModal').modal('show');
     }
+
+    // Update file label when file is selected
+    document.querySelector('#file').addEventListener('change', function(e) {
+        const fileName = e.target.files[0] ? e.target.files[0].name : 'Pilih file...';
+        const label = e.target.nextElementSibling;
+        label.textContent = fileName;
+    });
 </script>
 @endpush
 
@@ -182,6 +209,10 @@
     #previewContent table th {
         border: 1px solid #ddd;
         padding: 8px;
+    }
+
+    .custom-file-label::after {
+        content: "Browse";
     }
 </style>
 @endpush

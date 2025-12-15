@@ -62,32 +62,40 @@
             </div>
         @endif
 
-        {{-- Tombol Aksi --}}
-        <div class="p-6 flex flex-wrap gap-3">
-            @if($materi->tipe === 'pdf')
+      {{-- Tombol Aksi --}}
+    <div class="p-6 flex flex-wrap gap-3">
+        @if($materi->file_path)
+            {{-- Cek tipe file untuk tampilkan tombol yang sesuai --}}
+            @php
+                $extension = pathinfo($materi->file_path, PATHINFO_EXTENSION);
+                $isPdf = in_array(strtolower($extension), ['pdf']);
+                $isVideo = in_array(strtolower($extension), ['mp4', 'avi', 'mov']);
+            @endphp
+
+            @if($isPdf)
                 <a href="{{ route('peserta.materials.view-pdf', $materi->materi_id) }}" target="_blank"
-                   class="flex-1 inline-flex items-center justify-center bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-6 rounded-lg transition">
+                class="flex-1 inline-flex items-center justify-center bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-6 rounded-lg transition">
                     <i class="fas fa-file-pdf mr-2"></i> Lihat PDF
                 </a>
-            @elseif($materi->tipe === 'video')
+            @elseif($isVideo)
                 <a href="{{ route('peserta.materials.stream', $materi->materi_id) }}" target="_blank"
-                   class="flex-1 inline-flex items-center justify-center bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-6 rounded-lg transition">
+                class="flex-1 inline-flex items-center justify-center bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-6 rounded-lg transition">
                     <i class="fas fa-play-circle mr-2"></i> Putar Video
-                </a>
-            @elseif($materi->tipe === 'link')
-                <a href="{{ $materi->konten }}" target="_blank"
-                   class="flex-1 inline-flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition">
-                    <i class="fas fa-external-link-alt mr-2"></i> Buka Link
                 </a>
             @endif
 
-            @if($materi->tipe !== 'link')
-                <a href="{{ route('peserta.materials.download', $materi->materi_id) }}"
-                   class="flex-1 inline-flex items-center justify-center bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg transition">
-                    <i class="fas fa-download mr-2"></i> Download
-                </a>
-            @endif
-        </div>
+            {{-- Tombol Download --}}
+            <a href="{{ route('peserta.materials.download', $materi->materi_id) }}"
+            class="flex-1 inline-flex items-center justify-center bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg transition">
+                <i class="fas fa-download mr-2"></i> Download
+            </a>
+        @else
+            <div class="w-full text-center text-gray-500 py-4">
+                <i class="fas fa-info-circle mr-2"></i>
+                Materi ini tidak memiliki file lampiran
+            </div>
+        @endif
+    </div>
     </div>
 
     {{-- Materi Lain di Room yang Sama --}}

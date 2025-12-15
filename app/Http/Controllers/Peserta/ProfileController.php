@@ -1,29 +1,34 @@
 <?php
 
-namespace App\Http\Controllers\Mentor;
+namespace App\Http\Controllers\Peserta;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
+use Carbon\Carbon;
 
 class ProfileController extends Controller
 {
     public function index()
     {
         $user = Auth::user();
-        $mentor = $user->mentor;
+        $peserta = $user->peserta;
         
-        return view('mentor.profile.profile', compact('user', 'mentor'));
+        return view('peserta.profile.profile', compact('user', 'peserta'));
     }
 
     public function updateDataDiri(Request $request)
     {
         $request->validate([
             'nama' => 'required|string|max:255',
+            'nim' => 'nullable|string|max:50',
+            'institut' => 'required|string|max:255',
             'fungsi' => 'required|string|max:100',
-            'nomor_hp' => 'required|string|max:20',
+            'email' => 'required|email|max:255',
+            'periode_start' => 'required|date',
+            'periode_end' => 'required|date|after:periode_start',
         ]);
 
         $user = Auth::user();
@@ -33,10 +38,14 @@ class ProfileController extends Controller
             'nama' => $request->nama,
         ]);
 
-        // Update mentor (menggunakan field 'handphone' di database)
-        $user->mentor->update([
+        // Update peserta
+        $user->peserta->update([
+            'nim' => $request->nim,
+            'institut' => $request->institut,
             'fungsi' => $request->fungsi,
-            'handphone' => $request->nomor_hp, // Field asli di database adalah 'handphone'
+            'email' => $request->email,
+            'periode_start' => $request->periode_start,
+            'periode_end' => $request->periode_end,
         ]);
 
         return redirect()->back()->with('success', 'Data diri berhasil diperbarui!');

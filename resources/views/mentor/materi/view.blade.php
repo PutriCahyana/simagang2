@@ -48,6 +48,32 @@
                 {{ $materi->deskripsi ?? '-' }}
             </div>
         </div>
+
+        @if($materi->file_path)
+        <div class="row mb-3">
+            <div class="col-md-3">
+                <strong>File Lampiran:</strong>
+            </div>
+            <div class="col-md-9">
+                <div class="file-attachment-box">
+                    <i class="{{ $materi->getFileIcon() }} fa-2x mr-3"></i>
+                    <div class="file-info">
+                        <div class="file-name">{{ basename($materi->file_path) }}</div>
+                        <div class="file-meta">
+                            <span class="badge badge-secondary">{{ $materi->getFileType() }}</span>
+                            @if($materi->getFileSizeFormatted())
+                                <span class="text-muted ml-2">{{ $materi->getFileSizeFormatted() }}</span>
+                            @endif
+                        </div>
+                    </div>
+                    <a href="{{ route('mentor.materiDownload', $materi->materi_id) }}" 
+                       class="btn btn-sm btn-success ml-auto">
+                        <i class="fas fa-download"></i> Download
+                    </a>
+                </div>
+            </div>
+        </div>
+        @endif
         
         <div class="row mb-3">
             <div class="col-md-3">
@@ -103,6 +129,37 @@
 
 @push('styles')
 <style>
+    /* File Attachment Styling */
+    .file-attachment-box {
+        display: flex;
+        align-items: center;
+        padding: 15px;
+        background-color: #f8f9fc;
+        border: 1px solid #e3e6f0;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+
+    .file-attachment-box:hover {
+        background-color: #eaecf4;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .file-info {
+        flex: 1;
+    }
+
+    .file-name {
+        font-weight: 600;
+        color: #5a5c69;
+        margin-bottom: 5px;
+        word-break: break-word;
+    }
+
+    .file-meta {
+        font-size: 0.85rem;
+    }
+
     /* Styling untuk konten materi yang dibuat dengan CKEditor */
     .materi-content {
         line-height: 1.8;

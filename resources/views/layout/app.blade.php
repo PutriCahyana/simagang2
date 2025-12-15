@@ -33,34 +33,69 @@
                     <ul class="navbar-nav ml-auto">
 
                         <!-- Nav Item - User Information -->
-                        <li class="nav-item dropdown no-arrow">
-                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
-                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <span class="mr-2 d-none d-lg-inline text-gray-600 ">{{ auth()->user()->nama }}</span>
-                                <img class="img-profile rounded-circle"
-                                    src="{{ asset('sbadmin2/img/undraw_profile.svg') }}">
-                            </a>
-                            <!-- Dropdown - User Information -->
-                            <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
-                                aria-labelledby="userDropdown">
-                                <a class="dropdown-item" href="#">
-                                    <div class="badge badge-success justify-content-center d-flex">{{ auth()->user()->role }}</div>
-                                </a>
-                                 <a class="dropdown-item" href="#">
-                                    <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
-                                    Profile
-                                </a>
-                                <a class="dropdown-item" href="#">
-                                    <i class="fas fa-cog fa-sm fa-fw mr-2 text-gray-400"></i>
-                                    Settings
-                                </a>
-                                <div class="dropdown-divider"></div>
-                                <a class="dropdown-item" href="{{ route('logout') }}" data-toggle="modal" data-target="#logoutModal">
-                                    <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
-                                    Logout
-                                </a>
-                            </div>
-                        </li>
+                        <!-- Ganti SELURUH bagian dropdown di layout/app.blade.php -->
+
+<li class="nav-item dropdown no-arrow">
+    <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
+        data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <span class="mr-2 d-none d-lg-inline text-gray-600">{{ auth()->user()->nama }}</span>
+        
+        @if(auth()->user()->foto_profil)
+            <img class="img-profile rounded-circle" 
+                 src="{{ Storage::url(auth()->user()->foto_profil) }}" 
+                 alt="{{ auth()->user()->nama }}"
+                 style="width: 40px; height: 40px; object-fit: cover;">
+        @else
+            <div class="img-profile rounded-circle d-inline-flex align-items-center justify-content-center text-white font-weight-bold" 
+                 style="width: 40px; height: 40px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                {{ strtoupper(substr(auth()->user()->nama, 0, 2)) }}
+            </div>
+        @endif
+    </a>
+    
+    <!-- Dropdown - User Information -->
+    <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
+        aria-labelledby="userDropdown">
+        
+        <!-- Role Badge Header - BUKAN dropdown-item -->
+        <div class="dropdown-header text-center py-3">
+            <span class="badge badge-success px-3 py-2">{{ strtoupper(auth()->user()->role) }}</span>
+        </div>
+        
+        <div class="dropdown-divider my-0"></div>
+        
+        <!-- Profile Link -->
+        @if(auth()->user()->role == 'admin')
+            <a class="dropdown-item" href="#">
+                <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
+                Profile
+            </a>
+        @elseif(auth()->user()->role == 'mentor')
+            <a class="dropdown-item" href="{{ route('mentor.profile') }}">
+                <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
+                Profile
+            </a>
+        @elseif(auth()->user()->role == 'peserta')
+            <a class="dropdown-item" href="{{ route('peserta.profile.index') }}">
+                <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
+                Profile
+            </a>
+        @else
+            <a class="dropdown-item" href="#">
+                <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
+                Profile
+            </a>
+        @endif
+
+        <div class="dropdown-divider"></div>
+        
+        <!-- Logout Link -->
+        <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#logoutModal">
+            <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
+            Logout
+        </a>
+    </div>
+</li>
 
                     </ul>
 

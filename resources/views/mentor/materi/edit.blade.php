@@ -8,7 +8,7 @@
 
 <div class="card shadow">
     <div class="card-body">
-        <form action="{{ route('mentor.materiUpdate', $materi->materi_id) }}" method="POST">
+        <form action="{{ route('mentor.materiUpdate', $materi->materi_id) }}" method="POST" enctype="multipart/form-data">
             @csrf
             @method('PUT')
             
@@ -57,6 +57,48 @@
                 @error('konten')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
+            </div>
+
+            <div class="form-group">
+                <label for="file">File Lampiran</label>
+                
+                @if($materi->file_path)
+                <div class="current-file mb-3">
+                    <div class="alert alert-info d-flex align-items-center">
+                        <i class="{{ $materi->getFileIcon() }} fa-2x mr-3"></i>
+                        <div class="flex-grow-1">
+                            <strong>File Saat Ini:</strong><br>
+                            <span class="text-muted">{{ basename($materi->file_path) }}</span>
+                            @if($materi->getFileType())
+                                <span class="badge badge-secondary ml-2">{{ $materi->getFileType() }}</span>
+                            @endif
+                            @if($materi->getFileSizeFormatted())
+                                <span class="text-muted ml-2">({{ $materi->getFileSizeFormatted() }})</span>
+                            @endif
+                        </div>
+                        <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input" id="remove_file" name="remove_file" value="1">
+                            <label class="custom-control-label text-danger" for="remove_file">
+                                <i class="fas fa-trash"></i> Hapus File
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                @endif
+
+                <div class="custom-file">
+                    <input type="file" class="custom-file-input @error('file') is-invalid @enderror" 
+                           id="file" name="file" accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.jpg,.jpeg,.png,.gif,.mp4,.avi,.mov,.zip,.rar">
+                    <label class="custom-file-label" for="file">Pilih file...</label>
+                    @error('file')
+                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                    @enderror
+                </div>
+                <small class="form-text text-muted">
+                    <i class="fas fa-info-circle"></i> 
+                    Format yang didukung: PDF, Word, Excel, PowerPoint, Gambar (JPG, PNG, GIF), Video (MP4, AVI, MOV), Archive (ZIP, RAR). 
+                    Maksimal 10MB.
+                </small>
             </div>
 
             <div class="form-group mt-4">
@@ -142,6 +184,25 @@
         document.getElementById('previewContent').innerHTML = content;
         $('#previewModal').modal('show');
     }
+
+    // Update file label when file is selected
+    document.querySelector('#file').addEventListener('change', function(e) {
+        const fileName = e.target.files[0] ? e.target.files[0].name : 'Pilih file...';
+        const label = e.target.nextElementSibling;
+        label.textContent = fileName;
+    });
+
+    // Disable file input when remove checkbox is checked
+    document.querySelector('#remove_file')?.addEventListener('change', function(e) {
+        const fileInput = document.querySelector('#file');
+        if (e.target.checked) {
+            fileInput.disabled = true;
+            fileInput.nextElementSibling.textContent = 'File akan dihapus';
+        } else {
+            fileInput.disabled = false;
+            fileInput.nextElementSibling.textContent = 'Pilih file...';
+        }
+    });
 </script>
 @endpush
 
@@ -184,6 +245,14 @@
     #previewContent table th {
         border: 1px solid #ddd;
         padding: 8px;
+    }
+
+    .current-file .alert {
+        margin-bottom: 0;
+    }
+
+    .custom-file-label::after {
+        content: "Browse";
     }
 </style>
 @endpush

@@ -1,32 +1,33 @@
-    <!-- Bootstrap core JavaScript-->
+<!-- jQuery HARUS PALING PERTAMA -->
     <script src="{{ asset('sbadmin2/vendor/jquery/jquery.min.js') }}"></script>
-    <script src="{{ asset('sbadmin2/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+    
+    <!-- Bootstrap 5 JS (GANTI INI) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- jQuery Easing & SB Admin -->
     <script src="{{ asset('sbadmin2/vendor/jquery-easing/jquery.easing.min.js') }}"></script>
     <script src="{{ asset('sbadmin2/js/sb-admin-2.min.js') }}"></script>
    
-    <!-- Chart.js tambahkan di sini -->
+    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-        <!-- Page level plugins -->
+    <!-- DataTables -->
     <script src="{{ asset('sbadmin2/vendor/datatables/jquery.dataTables.min.js') }}"></script>
     <script src="{{ asset('sbadmin2/vendor/datatables/dataTables.bootstrap4.min.js') }}"></script>
     <script src="{{ asset('sbadmin2/js/demo/datatables-demo.js') }}"></script>
-    <script src="{{ asset('sweetalert2/dist/sweetalert2.all.min.js') }}"></script>
-    @stack('scripts')
-
     
-
-    {{-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script> --}}
+    <!-- SweetAlert2 -->
+    <script src="{{ asset('sweetalert2/dist/sweetalert2.all.min.js') }}"></script>
+    
+    <!-- Script dari halaman child (AJAX kita) -->
+    @stack('scripts')
 
     <script>
     function copyCode(id) {
         const codeElement = document.getElementById(`code-${id}`);
         const codeText = codeElement.innerText.trim();
 
-        // salin ke clipboard
         navigator.clipboard.writeText(codeText).then(() => {
-            // tampilkan notifikasi sweetalert
             Swal.fire({
                 icon: 'success',
                 title: 'Berhasil!',
@@ -43,7 +44,6 @@
         });
     }
     </script>
-
 
     @session('success')
     <script>
@@ -65,8 +65,5 @@
     </script>
     @endsession
 
-    
-
 </body>
-
 </html>

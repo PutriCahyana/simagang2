@@ -1,100 +1,156 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="utf-8">
-    <title>Logbook - {{ $peserta->nama }}</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <meta charset="UTF-8">
+    <title>Logbook Kegiatan Magang</title>
     <style>
-        @page {
-            margin: 1cm;
-        }
         body {
-            font-family: 'Arial', sans-serif;
+            font-family: Arial, sans-serif;
+            font-size: 11pt;
+            margin: 0;
+            padding: 20px;
         }
-        .signature-img {
-            max-width: 100px;
-            max-height: 50px;
-            object-fit: contain;
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .header h2 {
+            margin: 5px 0;
+            font-size: 14pt;
+            text-decoration: underline;
+        }
+        .info-section {
+            margin-bottom: 15px;
+            font-size: 11pt;
+        }
+        .info-section table {
+            border: none;
+        }
+        .info-section td {
+            padding: 3px 0;
+            border: none;
+        }
+        .info-section td:first-child {
+            width: 150px;
+        }
+        .info-section td:nth-child(2) {
+            width: 10px;
+        }
+        table.logbook-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        table.logbook-table th,
+        table.logbook-table td {
+            border: 1px solid #000;
+            padding: 8px;
+            text-align: left;
+            vertical-align: top;
+        }
+        table.logbook-table th {
+            background-color: #f0f0f0;
+            font-weight: bold;
+            text-align: center;
+        }
+        table.logbook-table td:first-child {
+            text-align: center;
+            width: 30px;
+        }
+        table.logbook-table td:nth-child(2) {
+            width: 100px;
+            text-align: center;
+        }
+        table.logbook-table td:nth-child(3) {
+            width: 100px;
+            text-align: center;
+        }
+        table.logbook-table td:nth-child(5) {
+            width: 80px;
+            text-align: center;
+        }
+        table.logbook-table td:nth-child(6) {
+            width: 100px;
+            text-align: center;
+        }
+        .month-section {
+            margin-bottom: 30px;
+            page-break-inside: avoid;
+        }
+        .month-header {
+            margin-bottom: 10px;
+            margin-top: 20px;
         }
     </style>
 </head>
-<body class="bg-white">
-    <div class="max-w-full">
-        <!-- Header -->
-        <div class="text-center border-b-4 border-gray-800 pb-4 mb-6">
-            <h1 class="text-2xl font-bold text-gray-800 mb-1">LOGBOOK KEGIATAN</h1>
-            <p class="text-gray-600">Peserta Magang</p>
-        </div>
+<body>
+    <div class="header">
+        <h2>LOGBOOK KEGIATAN MAGANG</h2>
+    </div>
 
-        <!-- Info Peserta -->
-        <div class="mb-6 bg-gray-50 p-4 rounded">
-            <table class="w-full text-sm">
-                <tr>
-                    <td class="font-semibold w-40">Nama Peserta</td>
-                    <td class="w-4">:</td>
-                    <td>{{ $peserta->nama }}</td>
-                </tr>
-                <tr>
-                    <td class="font-semibold">Username</td>
-                    <td>:</td>
-                    <td>{{ $peserta->username }}</td>
-                </tr>
-                <tr>
-                    <td class="font-semibold">Tanggal Export</td>
-                    <td>:</td>
-                    <td>{{ now()->format('d F Y') }}</td>
-                </tr>
+    <div class="info-section">
+        <table>
+            <tr>
+                <td>NAMA</td>
+                <td>:</td>
+                <td>{{ $peserta->nama ?? '' }}</td>
+            </tr>
+            <tr>
+                <td>NIM MAHASISWA</td>
+                <td>:</td>
+                <td>{{ $peserta->peserta->nim ?? '' }}</td>
+            </tr>
+            <tr>
+                <td>TEMPAT MAGANG</td>
+                <td>:</td>
+                <td>PT. Perta Arun Gas</td>
+            </tr>
+        </table>
+    </div>
+
+    @php
+        $logbooksByMonth = $logbooks->groupBy(function($item) {
+            return \Carbon\Carbon::parse($item->date)->format('Y-m');
+        });
+    @endphp
+
+    @foreach($logbooksByMonth as $monthKey => $monthLogbooks)
+        <div class="month-section">
+            <div class="month-header">
+                <strong>Bulan: {{ \Carbon\Carbon::parse($monthLogbooks->first()->date)->locale('id')->translatedFormat('F, Y') }}</strong>
+            </div>
+
+            <table class="logbook-table">
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Hari/Tanggal</th>
+                        <th>Waktu Kegiatan (jam)</th>
+                        <th>Uraian Kegiatan</th>
+                        <th>Paraf Instruktur</th>
+                        <th>Keterangan</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($monthLogbooks as $index => $logbook)
+                    <tr>
+                        <td>{{ $index + 1 }}</td>
+                        <td>{{ $logbook->date->locale('id')->translatedFormat('l, d-m-Y') }}</td>
+                        <td>{{ $logbook->jam_masuk }}-{{ $logbook->jam_keluar }}</td>
+                        <td>{{ $logbook->aktivitas }}</td>
+                        <td></td>
+                        <td>{{ $logbook->keterangan_label }}</td>
+                    </tr>
+                    @endforeach
+                </tbody>
             </table>
         </div>
+    @endforeach
 
-        <!-- Table Logbook -->
-        <table class="w-full border-collapse border border-gray-800 text-sm">
-            <thead>
-                <tr class="bg-gray-200">
-                    <th class="border border-gray-800 p-2 w-8 text-center">No</th>
-                    <th class="border border-gray-800 p-2 w-24">Tanggal</th>
-                    <th class="border border-gray-800 p-2 w-28">Jam</th>
-                    <th class="border border-gray-800 p-2">Aktivitas</th>
-                    <th class="border border-gray-800 p-2 w-24">Keterangan</th>
-                    <th class="border border-gray-800 p-2 w-32">Room</th>
-                    <th class="border border-gray-800 p-2 w-24 text-center">TTD Mentor</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse($logbooks as $index => $logbook)
-                    <tr>
-                        <td class="border border-gray-800 p-2 text-center">{{ $index + 1 }}</td>
-                        <td class="border border-gray-800 p-2">{{ $logbook->date->format('d/m/Y') }}</td>
-                        <td class="border border-gray-800 p-2 text-xs">{{ $logbook->jam_masuk }} - {{ $logbook->jam_keluar }}</td>
-                        <td class="border border-gray-800 p-2 text-xs">{{ $logbook->aktivitas }}</td>
-                        <td class="border border-gray-800 p-2 text-xs">{{ $logbook->keterangan_label }}</td>
-                        <td class="border border-gray-800 p-2 text-xs">{{ $logbook->room->nama_room }}</td>
-                        <td class="border border-gray-800 p-2 text-center">
-                            @if($logbook->approver && $logbook->approver->mentor && $logbook->approver->mentor->signature_path)
-                                <img src="{{ public_path('storage/' . $logbook->approver->mentor->signature_path) }}" 
-                                     class="signature-img mx-auto" 
-                                     alt="TTD">
-                            @else
-                                <span class="text-xs text-gray-500">(Belum ada TTD)</span>
-                            @endif
-                        </td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="7" class="border border-gray-800 p-4 text-center text-gray-500">
-                            Tidak ada logbook yang telah di-approve
-                        </td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
-
-        <!-- Footer -->
-        <div class="mt-6">
-            <p class="text-xs text-gray-500 italic">
-                Dokumen ini digenerate otomatis pada {{ now()->format('d F Y H:i') }} WIB
-            </p>
+    @if($logbooks->isEmpty())
+        <div style="text-align: center; padding: 20px;">
+            Belum ada logbook yang di-approve
         </div>
-    </div>
+    @endif
 </body>
 </html>

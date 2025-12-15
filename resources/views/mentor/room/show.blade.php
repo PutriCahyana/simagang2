@@ -157,9 +157,37 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Pengumuman -->
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-header bg-warning-soft border-0 pt-4 pb-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 fw-bold text-warning">
+                        <i class="bi bi-megaphone-fill me-2"></i>
+                        Pengumuman
+                    </h5>
+                    <button class="btn btn-sm btn-warning" onclick="$('#modalTambahPengumuman').modal('show')">
+                        <i class="bi bi-plus-circle me-1"></i>Tambah
+                    </button>
+                </div>
+            </div>
+            <div class="card-body p-3">
+                <div id="pengumumanList">
+                    <div class="text-center py-4">
+                        <div class="spinner-border spinner-border-sm text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="text-muted mt-2 mb-0 small">Memuat data...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
         </div>
     </div>
 </div>
+
 
 <!-- Modal Detail Task -->
 <div class="modal fade" id="taskDetailModal" tabindex="-1" aria-hidden="true">
@@ -252,6 +280,10 @@
         </div>
     </div>
 </div>
+
+{{-- Include Modals --}}
+@include('mentor.room.modals.createPengumuman')
+@include('mentor.room.modals.editPengumuman')
 
 @endsection
 
@@ -577,6 +609,33 @@
     flex: 1;
 }
 
+.bg-warning-soft {
+    background-color: #fef3c7;
+    }
+
+    .pengumuman-item {
+        padding: 12px;
+        background: #f9fafb;
+        border-radius: 10px;
+        margin-bottom: 10px;
+        transition: all 0.2s ease;
+        border-left: 3px solid transparent;
+    }
+
+    .pengumuman-item.penting {
+        border-left-color: #ef4444;
+        background: #fef2f2;
+    }
+
+    .pengumuman-item:hover {
+        background: white;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    .pengumuman-item.expired {
+        opacity: 0.6;
+    }
+
 /* Responsive untuk submission */
 @media (max-width: 576px) {
     .submission-header {
@@ -593,18 +652,254 @@
         height: 40px;
         font-size: 16px;
     }
+
 }
 </style>
 @endpush
 
 @push('scripts')
 <script>
+
 $(document).ready(function() {
     const roomId = {{ $room->room_id }};
     
     // Load data awal
     loadParticipants();
     loadTasks();
+
+    // ============ PENGUMUMAN MANAGEMENT ============
+function loadPengumuman() {
+    $.ajax({
+        url: `/mentor/room/${roomId}/pengumuman`,
+        method: 'GET',
+        success: function(pengumumanList) {
+            if (pengumumanList.length === 0) {
+                $('#pengumumanList').html(`
+                    <div class="text-center py-4">
+                        <i class="bi bi-megaphone display-4 text-muted opacity-25"></i>
+                        <p class="text-muted mt-2 mb-0 small">Belum ada pengumuman</p>
+                    </div>
+                `);
+                return;
+            }
+            
+            let html = '';
+            pengumumanList.slice(0, 3).forEach(function(item) {
+                const pentingClass = item.is_penting ? 'penting' : '';
+                const expiredClass = !item.is_aktif ? 'expired' : '';
+                const pentingBadge = item.is_penting ? '<span class="badge bg-danger text-white ms-1" style="font-size: 9px;">PENTING</span>' : '';
+                
+                html += `
+                    <div class="pengumuman-item ${pentingClass} ${expiredClass}">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h6 class="mb-0 fw-bold text-dark" style="font-size: 13px;">
+                                ${item.judul}${pentingBadge}
+                            </h6>
+                            <div class="dropdown">
+                                <button class="btn btn-sm btn-link text-muted p-0" data-bs-toggle="dropdown">
+                                    <i class="bi bi-three-dots-vertical"></i>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li>
+                                        <a class="dropdown-item edit-pengumuman" href="#" data-id="${item.pengumuman_id}">
+                                            <i class="bi bi-pencil me-2"></i>Edit
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item text-danger delete-pengumuman" href="#" data-id="${item.pengumuman_id}">
+                                            <i class="bi bi-trash me-2"></i>Hapus
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <p class="text-muted mb-1 small" style="font-size: 12px;">${item.isi.substring(0, 80)}${item.isi.length > 80 ? '...' : ''}</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small class="text-muted" style="font-size: 11px;">
+                                <i class="bi bi-clock me-1"></i>${item.created_at}
+                            </small>
+                            ${!item.is_aktif ? '<span class="badge bg-secondary" style="font-size: 9px;">Kadaluarsa</span>' : `<span class="badge bg-success" style="font-size: 9px;">${item.durasi_text}</span>`}
+                        </div>
+                    </div>
+                `;
+            });
+            
+            if (pengumumanList.length > 3) {
+                html += `<p class="text-center text-muted small mb-0">+${pengumumanList.length - 3} pengumuman lainnya</p>`;
+            }
+            
+            $('#pengumumanList').html(html);
+        },
+        error: function() {
+            $('#pengumumanList').html(`
+                <div class="text-center py-4">
+                    <i class="bi bi-exclamation-triangle text-danger"></i>
+                    <p class="text-muted mt-2 mb-0 small">Gagal memuat pengumuman</p>
+                </div>
+            `);
+        }
+    });
+}
+
+// Submit create pengumuman
+// Ganti bagian AJAX submit create pengumuman dengan ini untuk debugging:
+
+$('#formTambahPengumuman').on('submit', function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    const submitBtn = $(this).find('button[type="submit"]');
+    const originalText = submitBtn.html();
+    
+    // Debug: Log FormData contents
+    console.log('Form Data:');
+    for (let [key, value] of formData.entries()) {
+        console.log(key, value);
+    }
+    
+    $.ajax({
+        url: `/mentor/room/${roomId}/pengumuman`,
+        method: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
+        beforeSend: function() {
+            submitBtn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-2"></span>Loading...');
+        },
+        success: function(response) {
+            $('#modalTambahPengumuman').modal('hide');
+            $('#formTambahPengumuman')[0].reset();
+            showToast('success', response.message);
+            loadPengumuman();
+        },
+        error: function(xhr) {
+            // Debug: Log full error response
+            console.error('Error Status:', xhr.status);
+            console.error('Error Response:', xhr.responseJSON);
+            console.error('Error Text:', xhr.responseText);
+            
+            let errorMsg = 'Terjadi kesalahan';
+            
+            if (xhr.status === 422) {
+                // Validation error
+                if (xhr.responseJSON && xhr.responseJSON.errors) {
+                    errorMsg = Object.values(xhr.responseJSON.errors).flat().join('<br>');
+                }
+            } else if (xhr.status === 500) {
+                // Server error
+                errorMsg = 'Server Error: ' + (xhr.responseJSON?.message || 'Internal Server Error');
+                if (xhr.responseJSON?.exception) {
+                    console.error('Exception:', xhr.responseJSON.exception);
+                }
+            } else if (xhr.status === 403) {
+                errorMsg = 'Unauthorized: Anda tidak memiliki akses';
+            } else if (xhr.responseJSON?.message) {
+                errorMsg = xhr.responseJSON.message;
+            }
+            
+            showToast('error', errorMsg);
+        },
+        complete: function() {
+            submitBtn.prop('disabled', false).html(originalText);
+        }
+    });
+});
+
+// Edit pengumuman
+$(document).on('click', '.edit-pengumuman', function(e) {
+    e.preventDefault();
+    const pengumumanId = $(this).data('id');
+    
+    $.ajax({
+        url: `/mentor/room/${roomId}/pengumuman`,
+        method: 'GET',
+        success: function(pengumumanList) {
+            const pengumuman = pengumumanList.find(p => p.pengumuman_id === pengumumanId);
+            
+            if (pengumuman) {
+                $('#editPengumumanId').val(pengumuman.pengumuman_id);
+                $('#editJudul').val(pengumuman.judul);
+                $('#editIsi').val(pengumuman.isi);
+                $('#editDurasi').val(pengumuman.durasi_tampil);
+                $('#editIsPenting').prop('checked', pengumuman.is_penting);
+                
+                $('#editPengumumanModal').modal('show');
+            }
+        }
+    });
+});
+
+// Submit edit pengumuman
+$('#editPengumumanForm').on('submit', function(e) {
+    e.preventDefault();
+    
+    const pengumumanId = $('#editPengumumanId').val();
+    const formData = new FormData();
+    
+    formData.append('_method', 'PUT');
+    formData.append('_token', '{{ csrf_token() }}');
+    formData.append('judul', $('#editJudul').val());
+    formData.append('isi', $('#editIsi').val());
+    formData.append('durasi_tampil', $('#editDurasi').val());
+    formData.append('is_penting', $('#editIsPenting').is(':checked') ? 1 : 0);
+    
+    const submitBtn = $(this).find('button[type="submit"]');
+    const originalText = submitBtn.html();
+    
+    $.ajax({
+        url: `/mentor/room/${roomId}/pengumuman/${pengumumanId}`,
+        method: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
+        beforeSend: function() {
+            submitBtn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-2"></span>Loading...');
+        },
+        success: function(response) {
+            $('#editPengumumanModal').modal('hide');
+            showToast('success', response.message);
+            loadPengumuman();
+        },
+        error: function(xhr) {
+            let errorMsg = 'Terjadi kesalahan';
+            if (xhr.responseJSON && xhr.responseJSON.errors) {
+                errorMsg = Object.values(xhr.responseJSON.errors).flat().join('<br>');
+            }
+            showToast('error', errorMsg);
+        },
+        complete: function() {
+            submitBtn.prop('disabled', false).html(originalText);
+        }
+    });
+});
+
+// Delete pengumuman
+$(document).on('click', '.delete-pengumuman', function(e) {
+    e.preventDefault();
+    const pengumumanId = $(this).data('id');
+    
+    if (!confirm('Apakah Anda yakin ingin menghapus pengumuman ini?')) {
+        return;
+    }
+    
+    $.ajax({
+        url: `/mentor/room/${roomId}/pengumuman/${pengumumanId}`,
+        method: 'DELETE',
+        data: {
+            _token: '{{ csrf_token() }}'
+        },
+        success: function(response) {
+            showToast('success', response.message);
+            loadPengumuman();
+        },
+        error: function() {
+            showToast('error', 'Gagal menghapus pengumuman');
+        }
+    });
+});
+
+// Panggil loadPengumuman saat page load
+loadPengumuman();
     
     // Submit form task baru
     $('#taskForm').on('submit', function(e) {
@@ -965,7 +1260,7 @@ $(document).on('click', '.view-task', function() {
         }
     });
 });
-    
+
     // Edit task
     $(document).on('click', '.edit-task', function() {
         const taskId = $(this).data('task-id');
@@ -1060,5 +1355,7 @@ $(document).on('click', '.view-task', function() {
         }, 5000);
     }
 });
+
+
 </script>
 @endpush

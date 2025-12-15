@@ -16,22 +16,50 @@ class PesertaDashboardController extends Controller
         
         // Hitung periode magang
         $peserta = $user->peserta;
-        $periodeStart = $peserta ? Carbon::parse($peserta->periode_start) : null;
-        $periodeEnd = $peserta ? Carbon::parse($peserta->periode_end) : null;
-        $currentWeek = $periodeStart ? ceil($periodeStart->diffInWeeks(now()) + 1) : 0;
-        $totalWeeks = $periodeStart && $periodeEnd ? ceil($periodeStart->diffInWeeks($periodeEnd)) : 12;
-        $progress = $totalWeeks > 0 ? round(($currentWeek / $totalWeeks) * 100) : 0;
+        $periodeStart = $peserta ? Carbon::parse($peserta->periode_start)->startOfDay() : null;
+        $periodeEnd = $peserta ? Carbon::parse($peserta->periode_end)->endOfDay() : null;
         
-        // Hitung total hari kerja (exclude weekend) sejak periode start sampai sekarang
-        $workDays = 0;
-        if ($periodeStart) {
+        // 🔥 PERBAIKAN: Hitung progress berdasarkan HARI yang sudah berlalu
+        $totalWeeks = 0;
+        $currentWeek = 0;
+        $progress = 0;
+        
+        if ($periodeStart && $periodeEnd) {
+            $today = now()->startOfDay();
+            
+            // Total hari dalam periode magang
+            $totalDays = $periodeStart->diffInDays($periodeEnd) + 1; // +1 agar inclusive
+            $totalWeeks = max(1, ceil($totalDays / 7)); // Konversi ke minggu untuk display
+            
+            // Jika sekarang masih dalam periode magang
+            if ($today->between($periodeStart, $periodeEnd)) {
+                // Hitung hari yang sudah berlalu (hari pertama = 0)
+                $daysElapsed = max(0, $periodeStart->diffInDays($today)); // TANPA +1
+                $currentWeek = $daysElapsed > 0 ? ceil($daysElapsed / 7) : 1; // Tetap Week 1 di hari pertama
+                $progress = $totalDays > 0 ? round(($daysElapsed / $totalDays) * 100) : 0;
+            } 
+            // Jika belum mulai magang
+            elseif ($today->lt($periodeStart)) {
+                $currentWeek = 0;
+                $progress = 0;
+            }
+            // Jika sudah selesai magang
+            else {
+                $currentWeek = $totalWeeks;
+                $progress = 100;
+            }
+        }
+        
+        // 🔥 PERBAIKAN: Hitung total hari kerja dari periode_start sampai periode_end (BUKAN sampai sekarang!)
+        $totalWorkDays = 0;
+        if ($periodeStart && $periodeEnd) {
             $start = $periodeStart->copy();
-            $end = now();
+            $end = $periodeEnd->copy();
             
             while ($start->lte($end)) {
                 // Skip Saturday (6) dan Sunday (0)
                 if (!in_array($start->dayOfWeek, [0, 6])) {
-                    $workDays++;
+                    $totalWorkDays++;
                 }
                 $start->addDay();
             }
@@ -81,7 +109,8 @@ class PesertaDashboardController extends Controller
             })
             ->count();
         
-        $attendancePercentage = $workDays > 0 ? round(($attendanceDays / $workDays) * 100) : 0;
+        // 🔥 Persentase kehadiran dari total hari kerja SELURUH periode magang
+        $attendancePercentage = $totalWorkDays > 0 ? round(($attendanceDays / $totalWorkDays) * 100) : 0;
         
         // Stats: Evaluasi (rata-rata nilai dari submissions)
         $averageScore = \App\Models\Submission::where('user_id', $user->id)
@@ -101,11 +130,12 @@ class PesertaDashboardController extends Controller
             ->take(3)
             ->get();
         
-        // Announcements (dari Activity model, tipe announcement di room)
+        // ✅ Announcements (dari tabel pengumuman berdasarkan room yang diikuti)
         $announcements = collect();
         if ($room) {
-            $announcements = \App\Models\Activity::where('room_id', $room->room_id)
-                ->where('type', 'announcement')
+            $announcements = \App\Models\Pengumuman::where('room_id', $room->room_id)
+                ->where('tanggal_kadaluarsa', '>=', now()) // Hanya yang masih berlaku
+                ->orderBy('is_penting', 'desc') // Penting duluan
                 ->orderBy('created_at', 'desc')
                 ->take(3)
                 ->get();
@@ -121,7 +151,7 @@ class PesertaDashboardController extends Controller
             "totalWeeks" => $totalWeeks,
             "progress" => $progress,
             "totalLogbooks" => $totalLogbooks,
-            "workDays" => $workDays,
+            "totalWorkDays" => $totalWorkDays, // 🔥 Total hari kerja seluruh periode
             "pendingTasks" => $pendingTasks,
             "completedTasks" => $completedTasks,
             "attendanceDays" => $attendanceDays,
