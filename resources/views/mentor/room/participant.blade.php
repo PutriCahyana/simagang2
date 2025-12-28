@@ -45,9 +45,118 @@
         </div>
     </div>
 
+    <!-- Performance Statistics Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <!-- Average Grade Card -->
+        <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-blue-500">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-500 mb-1">Nilai Rata-rata</p>
+                    <p class="text-3xl font-bold text-gray-900">
+                        @if($stats['average_grade'])
+                            {{ $stats['average_grade'] }}
+                        @else
+                            <span class="text-gray-400 text-xl">-</span>
+                        @endif
+                    </p>
+                    @if($stats['average_grade'])
+                        <p class="text-xs text-gray-500 mt-1">dari {{ $stats['graded_tasks'] }} tugas dinilai</p>
+                    @endif
+                </div>
+                <div class="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center">
+                    <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- Completed Tasks Card -->
+        <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-green-500">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-500 mb-1">Task Selesai</p>
+                    <p class="text-3xl font-bold text-gray-900">{{ $stats['completed_tasks'] }}</p>
+                    <p class="text-xs text-gray-500 mt-1">dari {{ $stats['total_tasks'] }} tugas</p>
+                </div>
+                <div class="h-12 w-12 rounded-full bg-green-100 flex items-center justify-center">
+                    <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- Completion Rate Card -->
+        <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-purple-500">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-500 mb-1">Tingkat Penyelesaian</p>
+                    <p class="text-3xl font-bold text-gray-900">{{ $stats['completion_rate'] }}%</p>
+                    <div class="mt-2 w-full bg-gray-200 rounded-full h-2">
+                        <div class="bg-purple-600 h-2 rounded-full transition-all duration-500" style="width: {{ $stats['completion_rate'] }}%"></div>
+                    </div>
+                </div>
+                <div class="h-12 w-12 rounded-full bg-purple-100 flex items-center justify-center">
+                    <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- Magang Progress Card -->
+        @if($stats['magang_progress'])
+        <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-orange-500">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-500 mb-1">Progress Magang</p>
+                    <p class="text-3xl font-bold text-gray-900">{{ $stats['magang_progress']['progress'] }}%</p>
+                    <p class="text-xs text-gray-500 mt-1">
+                        {{ $stats['magang_progress']['days_remaining'] }} hari tersisa
+                    </p>
+                </div>
+                <div class="h-12 w-12 rounded-full bg-orange-100 flex items-center justify-center">
+                    <svg class="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+            </div>
+        </div>
+        @endif
+    </div>
+
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <!-- Left Column - Main Info -->
         <div class="lg:col-span-2 space-y-6">
+            <!-- Task Progress Breakdown -->
+            <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                <div class="bg-gray-50 px-6 py-4 border-b border-gray-200">
+                    <h2 class="text-xl font-semibold text-gray-800 flex items-center">
+                        <svg class="w-6 h-6 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                        </svg>
+                        Status Pengerjaan Tugas
+                    </h2>
+                </div>
+                <div class="p-6">
+                    <div class="grid grid-cols-3 gap-4">
+                        <div class="text-center p-4 bg-green-50 rounded-lg">
+                            <div class="text-3xl font-bold text-green-600">{{ $stats['graded_tasks'] }}</div>
+                            <div class="text-sm text-gray-600 mt-1">Sudah Dinilai</div>
+                        </div>
+                        <div class="text-center p-4 bg-yellow-50 rounded-lg">
+                            <div class="text-3xl font-bold text-yellow-600">{{ $stats['pending_tasks'] }}</div>
+                            <div class="text-sm text-gray-600 mt-1">Menunggu Penilaian</div>
+                        </div>
+                        <div class="text-center p-4 bg-gray-50 rounded-lg">
+                            <div class="text-3xl font-bold text-gray-600">{{ $stats['total_tasks'] - $stats['completed_tasks'] }}</div>
+                            <div class="text-sm text-gray-600 mt-1">Belum Dikerjakan</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Informasi Umum -->
             <div class="bg-white rounded-lg shadow-md overflow-hidden">
                 <div class="bg-gray-50 px-6 py-4 border-b border-gray-200">
@@ -114,47 +223,26 @@
                         </div>
                     </div>
                     
-                    @php
-                        $start = \Carbon\Carbon::parse($peserta->peserta->periode_start);
-                        $end = \Carbon\Carbon::parse($peserta->peserta->periode_end);
-                        $now = \Carbon\Carbon::now();
-                        
-                        $totalDays = round($start->diffInDays($end));
-                        $daysElapsed = round($start->diffInDays($now));
-                        $daysRemaining = round($now->diffInDays($end));
-                        
-                        if ($now->lt($start)) {
-                            $progress = 0;
-                            $status = 'Belum Dimulai';
-                            $statusColor = 'bg-gray-100 text-gray-800';
-                        } elseif ($now->gt($end)) {
-                            $progress = 100;
-                            $status = 'Selesai';
-                            $statusColor = 'bg-green-100 text-green-800';
-                        } else {
-                            $progress = ($daysElapsed / $totalDays) * 100;
-                            $status = 'Sedang Berlangsung';
-                            $statusColor = 'bg-blue-100 text-blue-800';
-                        }
-                    @endphp
-                    
+                    @if($stats['magang_progress'])
                     <div class="mt-6">
                         <div class="flex items-center justify-between mb-2">
                             <span class="text-sm font-medium text-gray-700">Progress Periode</span>
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $statusColor }}">
-                                {{ $status }}
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium 
+                                {{ $stats['magang_progress']['status'] === 'Selesai' ? 'bg-green-100 text-green-800' : 
+                                   ($stats['magang_progress']['status'] === 'Sedang Berlangsung' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800') }}">
+                                {{ $stats['magang_progress']['status'] }}
                             </span>
                         </div>
                         <div class="w-full bg-gray-200 rounded-full h-3">
-                            <div class="bg-blue-600 h-3 rounded-full transition-all duration-500" style="width: {{ $progress }}%"></div>
+                            <div class="bg-blue-600 h-3 rounded-full transition-all duration-500" 
+                                 style="width: {{ $stats['magang_progress']['progress'] }}%"></div>
                         </div>
                         <div class="mt-2 flex justify-between text-sm text-gray-600">
-                            <span>{{ round($progress, 1) }}% selesai</span>
-                            @if($now->between($start, $end))
-                                <span>{{ $daysRemaining }} hari tersisa</span>
-                            @endif
+                            <span>{{ $stats['magang_progress']['progress'] }}% selesai</span>
+                            <span>{{ $stats['magang_progress']['days_elapsed'] }} / {{ $stats['magang_progress']['total_days'] }} hari</span>
                         </div>
                     </div>
+                    @endif
                 </div>
             </div>
             @endif
@@ -227,10 +315,14 @@
                     <div class="flex items-center justify-between">
                         <span class="text-sm text-gray-600">Durasi Magang</span>
                         <span class="text-lg font-bold text-blue-600">
-                            {{ \Carbon\Carbon::parse($peserta->peserta->periode_start)->diffInDays(\Carbon\Carbon::parse($peserta->peserta->periode_end)) }} hari
+                            {{ $stats['magang_progress']['total_days'] ?? 0 }} hari
                         </span>
                     </div>
                     @endif
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-gray-600">Task Completion</span>
+                        <span class="text-lg font-bold text-blue-600">{{ $stats['completion_rate'] }}%</span>
+                    </div>
                 </div>
             </div>
         </div>

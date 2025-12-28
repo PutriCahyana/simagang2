@@ -5,6 +5,17 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2>Logbook Saya</h2>
         <div>
+
+            <!-- Button Sertifikat -->
+            {{-- <a href="{{ route('peserta.sertifikat.status') }}" class="btn btn-info text-white me-2">
+                <i class="bi bi-award"></i> Sertifikat
+            </a> --}}
+
+             <!-- Button Sertifikat - Trigger Modal -->
+            <button type="button" class="btn btn-info text-white me-2" data-bs-toggle="modal" data-bs-target="#sertifikatModal">
+                <i class="bi bi-award"></i> Sertifikat
+            </button>
+
             <a href="{{ route('peserta.logbook.create') }}" class="btn btn-primary">
                 <i class="bi bi-plus-circle"></i> Tambah Logbook
             </a>
@@ -135,4 +146,112 @@
         </div>
     </div>
 </div>
+
+<!-- Modal Sertifikat -->
+<div class="modal fade" id="sertifikatModal" tabindex="-1" aria-labelledby="sertifikatModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="sertifikatModalLabel">
+                    <i class="bi bi-award me-2"></i>Status Sertifikat
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="certificateContent">
+                    <div class="text-center py-5">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="mt-3">Memuat status sertifikat...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.timeline-container {
+    position: relative;
+    padding: 20px 0;
+}
+
+.timeline-step {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 40px;
+}
+
+.timeline-step:last-child {
+    margin-bottom: 0;
+}
+
+.timeline-icon {
+    flex-shrink: 0;
+    width: 60px;
+    display: flex;
+    justify-content: center;
+    z-index: 2;
+}
+
+.timeline-content {
+    flex-grow: 1;
+    padding-left: 20px;
+    padding-top: 5px;
+}
+
+.timeline-line {
+    position: absolute;
+    left: 30px;
+    top: 50px;
+    width: 2px;
+    height: 60px;
+    background-color: #e0e0e0;
+    z-index: 1;
+}
+
+.timeline-line.active {
+    background-color: #28a745;
+}
+
+.timeline-step.completed .timeline-content h6 {
+    color: #28a745;
+}
+
+.timeline-step.active .timeline-content h6 {
+    color: #ffc107;
+}
+
+.timeline-step.pending .timeline-content h6 {
+    color: #6c757d;
+}
+</style>
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const sertifikatModal = document.getElementById('sertifikatModal');
+    
+    sertifikatModal.addEventListener('show.bs.modal', function() {
+        // Load sertifikat status via AJAX
+        fetch('{{ route('peserta.sertifikat.status.ajax') }}')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('certificateContent').innerHTML = data.html;
+            })
+            .catch(error => {
+                document.getElementById('certificateContent').innerHTML = `
+                    <div class="alert alert-danger">
+                        <i class="bi bi-exclamation-triangle me-2"></i>
+                        Gagal memuat status sertifikat. Silakan coba lagi.
+                    </div>
+                `;
+            });
+    });
+});
+</script>
+@endpush
+
 @endsection

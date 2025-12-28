@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\MateriController;
 use App\Http\Controllers\Admin\PesertaController;
 use App\Http\Controllers\Admin\RoomViewController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\SertifikatController;
 use App\Http\Controllers\Mentor\PengumumanController;
 use App\Http\Controllers\Peserta\PesertaDashboardController;
 use App\Http\Controllers\Mentor\RoomController as MentorRoomController;
@@ -22,6 +23,7 @@ use App\Http\Controllers\Peserta\MateriController as PesertaMateriController;
 use App\Http\Controllers\Mentor\RoomViewController as MentorRoomViewController;
 use App\Http\Controllers\Peserta\LogbookController as PesertaLogbookController;
 use App\Http\Controllers\Peserta\ProfileController as PesertaProfileController;
+use App\Http\Controllers\Peserta\SertifikatController as PesertaSertifikatController;
 use App\Http\Controllers\Mentor\DashboardController as MentorDashboardController;
 use App\Http\Controllers\Peserta\ParticipantRoomController as PesertaParticipantRoomController;
 
@@ -55,6 +57,13 @@ Route::middleware(['MidLogin:admin'])->group(function(){
     Route::get('/admin/room-detail', [DashboardController::class, 'getRoomDetail']);
     Route::get('/admin/room/{roomId}/detail', [DashboardController::class, 'getRoomDetailById']);
     Route::get('/admin/home/peserta/{user_id}', [DashboardController::class, 'showPeserta'])->name('admin.home.peserta');
+
+    Route::get('admin/profile', [App\Http\Controllers\Admin\ProfileController::class, 'index'])->name('admin.profile.index');
+    Route::post('admin/profile/update-data-diri', [App\Http\Controllers\Admin\ProfileController::class, 'updateDataDiri'])->name('admin.profile.update-data-diri');
+    Route::post('admin/profile/update-username', [App\Http\Controllers\Admin\ProfileController::class, 'updateUsername'])->name('admin.profile.update-username');
+    Route::post('admin/profile/update-password', [App\Http\Controllers\Admin\ProfileController::class, 'updatePassword'])->name('admin.profile.update-password');
+    Route::post('admin/profile/update-foto', [App\Http\Controllers\Admin\ProfileController::class, 'updateFotoProfil'])->name('admin.profile.update-foto');
+    Route::delete('admin/profile/delete-foto', [App\Http\Controllers\Admin\ProfileController::class, 'deleteFotoProfil'])->name('admin.profile.delete-foto');
 
     // User mentor Management
     Route::get('user', [UserController::class, 'index'])->name('user');
@@ -99,6 +108,29 @@ Route::middleware(['MidLogin:admin'])->group(function(){
     Route::get('admin/peserta', [PesertaController::class, 'index'])->name('admin.peserta.index');
     Route::get('admin/peserta/{id}', [PesertaController::class, 'show'])->name('admin.peserta.show');
     Route::delete('admin/peserta/{id}', [PesertaController::class, 'destroy'])->name('admin.peserta.destroy');
+
+    Route::prefix('admin/sertifikat')->name('admin.sertifikat.')->group(function () {
+        // Index - halaman utama dengan tabs
+        Route::get('/', [SertifikatController::class, 'index'])->name('index');
+        
+        // Settings sertifikat
+        Route::get('/settings', [SertifikatController::class, 'settings'])->name('settings');
+        Route::post('/settings', [SertifikatController::class, 'updateSettings'])->name('settings.update');
+        
+        // Generate sertifikat (dari tab Belum Generate)
+        Route::get('/generate', [SertifikatController::class, 'generate'])->name('generate');
+        Route::post('/generate', [SertifikatController::class, 'storeGenerate'])->name('generate.store');
+        
+        // Review & Approve (dari tab Draft)
+        Route::get('/review', [SertifikatController::class, 'review'])->name('review');
+        Route::post('/approve', [SertifikatController::class, 'approve'])->name('approve');
+        
+        // Preview sertifikat (dari tab Approved)
+        Route::get('/preview/{id}', [SertifikatController::class, 'preview'])->name('preview');
+        
+        // Delete bulk draft
+        Route::delete('/delete-bulk', [SertifikatController::class, 'deleteBulk'])->name('delete-bulk');
+    });
 });
 
 // ===== MENTOR ROUTES =====
@@ -158,6 +190,8 @@ Route::middleware(['MidLogin:mentor'])->group(function(){
         Route::post('/room/{room_id}/tasks', [MentorRoomViewController::class, 'storeTask']);
         Route::put('/room/{room_id}/tasks/{task_id}', [MentorRoomViewController::class, 'updateTask']);
         Route::delete('/room/{room_id}/tasks/{task_id}', [MentorRoomViewController::class, 'deleteTask']);
+        Route::post('/room/{room_id}/submission/{submission_id}/grade', [MentorRoomViewController::class, 'gradeSubmission'])->name('submission.grade');
+    
 
         // untuk pengumuman
         Route::get('/room/{room_id}/pengumuman', [PengumumanController::class, 'index']);
@@ -219,6 +253,13 @@ Route::middleware(['MidLogin:peserta'])->group(function(){
     // Export
     Route::get('peserta/logbook/export/pdf', [PesertaLogbookController::class, 'exportPdf'])->name('peserta.logbook.export.pdf');
     Route::get('peserta/logbook/export/excel', [PesertaLogbookController::class, 'exportExcel'])->name('peserta.logbook.export.excel');
+
+    Route::prefix('peserta/sertifikat')->name('peserta.sertifikat.')->group(function () {
+        Route::get('/status-ajax', [PesertaSertifikatController::class, 'statusAjax'])->name('status.ajax');
+        Route::get('/status', [PesertaSertifikatController::class, 'Status'])->name('status');
+        Route::get('/preview', [PesertaSertifikatController::class, 'Preview'])->name('preview');
+        Route::get('/download', [PesertaSertifikatController::class, 'Download'])->name('download');
+    });
 
 
     // Route::prefix('peserta')->name('peserta.')->group(function () {

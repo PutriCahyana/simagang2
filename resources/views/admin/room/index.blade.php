@@ -29,7 +29,7 @@
                     <th>Mentor</th>
                     <th>Created at</th>
                     <th>Code</th>
-                    <th>Action</th>
+                    <th style="width: 140px;">Action</th>
                 </tr>
             </thead>
             <tbody>
@@ -56,7 +56,7 @@
 
 
 
-               <td class="text-center">
+               <td class="text-center" style="white-space: nowrap;">
                     <a href="{{ route('room.show', $room->room_id) }}" class="btn btn-success btn-sm" title="Lihat">
                         <i class="fas fa-eye"></i>
                     </a>
@@ -82,7 +82,7 @@
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="6" class="text-center text-muted">
+                    <td colspan="7" class="text-center text-muted">
                         <div class="py-4">
                             <i class="fas fa-inbox fa-3x mb-3"></i>
                             <h5>Belum ada data room</h5>

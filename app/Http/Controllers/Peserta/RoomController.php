@@ -59,6 +59,18 @@ class RoomController extends Controller
             ];
         });
 
+        // ✅ HITUNG RATA-RATA NILAI
+        $submissionsWithGrades = $tugasList->filter(function($task) {
+            return $task['grade'] !== null;
+        });
+        
+        $averageGrade = $submissionsWithGrades->count() > 0 
+            ? round($submissionsWithGrades->avg('grade'), 1) 
+            : null;
+
+        // ✅ HITUNG TOTAL JAM BELAJAR (estimasi dari materi)
+        $totalJamBelajar = $room->materis()->count() * 0.5; // Asumsi 30 menit = 0.5 jam per materi
+
         $materiList = $room->materis()->orderBy('created_at', 'desc')->get()->map(function($materi) {
             $tipe = 'artikel';
             if (filter_var($materi->konten, FILTER_VALIDATE_URL)) {
@@ -92,7 +104,14 @@ class RoomController extends Controller
             ->latest()
             ->get();
 
-        return view('peserta.room.show', compact('room', 'tugasList', 'materiList', 'pengumumanList'));
+        return view('peserta.room.show', compact(
+            'room', 
+            'tugasList', 
+            'materiList', 
+            'pengumumanList',
+            'averageGrade',
+            'totalJamBelajar'
+        ));
     }
 
     public function getTaskDetail($task_id)
@@ -127,11 +146,9 @@ class RoomController extends Controller
             'deskripsi' => $task->deskripsi,
             'deadline' => $task->deadline->format('Y-m-d'),
             'status' => $status,
-            // ✅ TAMBAHKAN INI: File tugas dari mentor
             'task_file_path' => $task->file_path,
             'task_file_url' => $task->file_path ? asset('storage/' . $task->file_path) : null,
             'task_file_name' => $task->file_path ? basename($task->file_path) : null,
-            // Data submission peserta
             'submitted_at' => $submission ? $submission->created_at->format('Y-m-d H:i:s') : null,
             'grade' => $submission ? $submission->nilai : null,
             'submission_file' => $submission ? $submission->file_path : null,

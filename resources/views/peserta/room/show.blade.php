@@ -183,22 +183,47 @@
                     <h6 class="m-0 font-weight-bold text-primary">📈 Statistik</h6>
                 </div>
                 <div class="card-body">
+                    <!-- Rata-rata Nilai -->
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted small">Rata-rata Nilai</span>
+                        @if($averageGrade !== null)
+                            <span class="font-weight-bold {{ $averageGrade >= 80 ? 'text-success' : ($averageGrade >= 60 ? 'text-warning' : 'text-danger') }}">
+                                {{ $averageGrade }}
+                            </span>
+                        @else
+                            <span class="font-weight-bold text-muted">-</span>
+                        @endif
+                    </div>
+
+                    <!-- Total Tugas -->
                     <div class="d-flex justify-content-between mb-2">
                         <span class="text-muted small">Total Tugas</span>
                         <span class="font-weight-bold text-primary">{{ $tugasList->count() }}</span>
                     </div>
+
+                    <!-- Tugas Selesai -->
                     <div class="d-flex justify-content-between mb-2">
                         <span class="text-muted small">Tugas Selesai</span>
                         <span class="font-weight-bold text-success">{{ $tugasList->where('status', 'selesai')->count() }}</span>
                     </div>
+
+                    <!-- Tugas Pending -->
                     <div class="d-flex justify-content-between mb-2">
                         <span class="text-muted small">Tugas Pending</span>
                         <span class="font-weight-bold text-warning">{{ $tugasList->where('status', 'pending')->count() }}</span>
                     </div>
-                    <div class="d-flex justify-content-between">
+
+                    <!-- Tugas Terlambat -->
+                    <div class="d-flex justify-content-between mb-2">
                         <span class="text-muted small">Tugas Terlambat</span>
                         <span class="font-weight-bold text-danger">{{ $tugasList->where('status', 'terlambat')->count() }}</span>
                     </div>
+
+                    {{-- <!-- Total Jam Belajar -->
+                    <div class="d-flex justify-content-between">
+                        <span class="text-muted small">Total Jam Belajar</span>
+                        <span class="font-weight-bold text-primary">{{ number_format($totalJamBelajar, 1) }} jam</span>
+                    </div> --}}
                 </div>
             </div>
 
