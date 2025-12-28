@@ -70,7 +70,93 @@ class RoomViewController extends Controller
             ->with(['peserta', 'joinedRooms'])
             ->firstOrFail();
         
-        return view('mentor.room.participant', compact('peserta', 'room'));
+        // === HITUNG STATISTIK PESERTA ===
+        
+        // 1. Total task di room ini
+        $totalTasks = Task::where('room_id', $room_id)->count();
+        
+        // 2. Task yang sudah dikerjakan (ada submission)
+        $completedTasksCount = \App\Models\Submission::whereHas('task', function($query) use ($room_id) {
+                $query->where('room_id', $room_id);
+            })
+            ->where('user_id', $user_id)
+            ->count();
+        
+        // 3. Nilai rata-rata (hanya yang sudah dinilai)
+        $averageGrade = \App\Models\Submission::whereHas('task', function($query) use ($room_id) {
+                $query->where('room_id', $room_id);
+            })
+            ->where('user_id', $user_id)
+            ->whereNotNull('nilai')
+            ->avg('nilai');
+        
+        // 4. Detail submissions untuk progress breakdown
+        $submissions = \App\Models\Submission::with('task')
+            ->whereHas('task', function($query) use ($room_id) {
+                $query->where('room_id', $room_id);
+            })
+            ->where('user_id', $user_id)
+            ->get();
+        
+        $gradedCount = $submissions->whereNotNull('nilai')->count();
+        $pendingCount = $submissions->where('nilai', null)->count();
+        
+        // 5. Progress magang (dari model Peserta) - SAMA SEPERTI DASHBOARD
+        $magangProgress = null;
+        if ($peserta->peserta) {
+            $start = \Carbon\Carbon::parse($peserta->peserta->periode_start)->startOfDay();
+            $end = \Carbon\Carbon::parse($peserta->peserta->periode_end)->endOfDay();
+            $now = \Carbon\Carbon::now()->startOfDay();
+            
+            // Total hari dalam periode magang (+1 agar inclusive)
+            $totalDays = round($start->diffInDays($end)) + 1;
+            
+            // Jika sekarang masih dalam periode magang
+            if ($now->between($start, $end)) {
+                // Hitung hari yang sudah berlalu (hari pertama = 0, TANPA +1)
+                $daysElapsed = max(0, round($start->diffInDays($now)));
+                $daysRemaining = max(0, round($now->diffInDays($end)));
+                $progress = $totalDays > 0 ? round(($daysElapsed / $totalDays) * 100, 1) : 0;
+                $status = 'Sedang Berlangsung';
+            } 
+            // Jika belum mulai magang
+            elseif ($now->lt($start)) {
+                $daysElapsed = 0;
+                $daysRemaining = round($start->diffInDays($end)) + 1;
+                $progress = 0;
+                $status = 'Belum Dimulai';
+            }
+            // Jika sudah selesai magang
+            else {
+                $daysElapsed = $totalDays;
+                $daysRemaining = 0;
+                $progress = 100;
+                $status = 'Selesai';
+            }
+            
+            $magangProgress = [
+                'progress' => $progress,
+                'status' => $status,
+                'total_days' => $totalDays,
+                'days_elapsed' => $daysElapsed,
+                'days_remaining' => $daysRemaining,
+            ];
+        }
+        
+        // 6. Task completion rate
+        $completionRate = $totalTasks > 0 ? ($completedTasksCount / $totalTasks) * 100 : 0;
+        
+        $stats = [
+            'total_tasks' => $totalTasks,
+            'completed_tasks' => $completedTasksCount,
+            'graded_tasks' => $gradedCount,
+            'pending_tasks' => $pendingCount,
+            'average_grade' => $averageGrade ? round($averageGrade, 1) : null,
+            'completion_rate' => round($completionRate, 1),
+            'magang_progress' => $magangProgress,
+        ];
+        
+        return view('mentor.room.participant', compact('peserta', 'room', 'stats'));
     }
 
    public function removeParticipant(Request $request, $room_id, $user_id)
@@ -368,5 +454,81 @@ class RoomViewController extends Controller
         }
         
         return Storage::download($filePath);
+    }
+
+    public function gradeSubmission(Request $request, $room_id, $submission_id)
+    {
+        try {
+            $room = Room::where('room_id', $room_id)->firstOrFail();
+            
+            $user = Auth::user();
+            if (!$user->mentor || $room->mentor_id !== $user->mentor->mentor_id) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Anda tidak memiliki akses untuk menilai submission ini'
+                ], 403);
+            }
+            
+            $submission = \App\Models\Submission::where('submission_id', $submission_id)
+                ->with(['task', 'user'])
+                ->firstOrFail();
+            
+            if ((int)$submission->task->room_id !== (int)$room_id) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Submission tidak ada di room ini'
+                ], 403);
+            }
+            
+            // CEK APAKAH SUBMISSION TERLAMBAT
+            $isLate = $submission->status === 'late';
+            $maxNilai = $isLate ? 85 : 100;
+            
+            // VALIDASI DENGAN MAX NILAI DINAMIS
+            $request->validate([
+                'nilai' => "required|integer|min:0|max:$maxNilai",
+                'feedback' => 'nullable|string|max:1000'
+            ], [
+                'nilai.max' => $isLate ? 
+                    'Nilai maksimal untuk submission terlambat adalah 85' : 
+                    'Nilai maksimal adalah 100'
+            ]);
+            
+            $submission->nilai = $request->nilai;
+            $submission->feedback = $request->feedback;
+            $submission->status = 'graded';
+            $submission->save();
+            
+            Activity::create([
+                'user_id' => Auth::id(),
+                'room_id' => $room_id,
+                'type' => 'graded',
+                'description' => 'Graded submission from ' . $submission->user->nama . ' with score: ' . $request->nilai,
+            ]);
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Nilai berhasil disimpan',
+                'data' => [
+                    'nilai' => $submission->nilai,
+                    'feedback' => $submission->feedback,
+                    'status' => $submission->status,
+                    'graded_at' => $submission->updated_at->format('d M Y H:i')
+                ]
+            ], 200);
+            
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validasi gagal',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            \Log::error('Error grading submission: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+            ], 500);
+        }
     }
 }

@@ -55,6 +55,13 @@
                         <span>Peserta</span></a>
                 </li>
 
+                <!-- Nav Item - sertifikat -->
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('admin.sertifikat.index') }}">
+                        <i class="fas fa-fw fa-table"></i>
+                        <span>Sertifikat</span></a>
+                </li>
+
 
             <!-- Sidebar Toggler (Sidebar) -->
             <div class="text-center d-none d-md-inline">

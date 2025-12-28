@@ -159,35 +159,32 @@
             </div>
 
             <!-- Pengumuman -->
-        <div class="card shadow-sm border-0 mb-4">
-            <div class="card-header bg-warning-soft border-0 pt-4 pb-3">
-                <div class="d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0 fw-bold text-warning">
-                        <i class="bi bi-megaphone-fill me-2"></i>
-                        Pengumuman
-                    </h5>
-                    <button class="btn btn-sm btn-warning" onclick="$('#modalTambahPengumuman').modal('show')">
-                        <i class="bi bi-plus-circle me-1"></i>Tambah
-                    </button>
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-warning-soft border-0 pt-4 pb-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0 fw-bold text-warning">
+                            <i class="bi bi-megaphone-fill me-2"></i>
+                            Pengumuman
+                        </h5>
+                        <button class="btn btn-sm btn-warning" onclick="$('#modalTambahPengumuman').modal('show')">
+                            <i class="bi bi-plus-circle me-1"></i>Tambah
+                        </button>
+                    </div>
                 </div>
-            </div>
-            <div class="card-body p-3">
-                <div id="pengumumanList">
-                    <div class="text-center py-4">
-                        <div class="spinner-border spinner-border-sm text-primary" role="status">
-                            <span class="visually-hidden">Loading...</span>
+                <div class="card-body p-3">
+                    <div id="pengumumanList">
+                        <div class="text-center py-4">
+                            <div class="spinner-border spinner-border-sm text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <p class="text-muted mt-2 mb-0 small">Memuat data...</p>
                         </div>
-                        <p class="text-muted mt-2 mb-0 small">Memuat data...</p>
                     </div>
                 </div>
             </div>
         </div>
-
-
-        </div>
     </div>
 </div>
-
 
 <!-- Modal Detail Task -->
 <div class="modal fade" id="taskDetailModal" tabindex="-1" aria-hidden="true">
@@ -274,6 +271,72 @@
                     
                     <button type="submit" class="btn btn-primary w-100">
                         <i class="bi bi-save me-2"></i>Simpan Perubahan
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Beri Nilai - TAMBAHAN BARU -->
+<div class="modal fade" id="gradeModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-success text-white border-0">
+                <h5 class="modal-title fw-bold">
+                    <i class="bi bi-star-fill me-2"></i>Beri Nilai
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <!-- Info Peserta -->
+                <div class="alert alert-info mb-4">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="submission-avatar" id="gradeStudentAvatar" style="width: 48px; height: 48px;">A</div>
+                        <div>
+                            <h6 class="mb-0 fw-bold" id="gradeStudentName">Nama Peserta</h6>
+                            <small class="text-muted" id="gradeSubmittedAt">Submitted at</small>
+                        </div>
+                    </div>
+                </div>
+
+                <form id="gradeForm">
+                    @csrf
+                    <input type="hidden" id="gradeSubmissionId">
+                    
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold" id="gradeLabelNilai">
+                            <i class="bi bi-trophy text-warning me-2"></i>Nilai (0-100)
+                        </label>
+                        <input type="number" 
+                            class="form-control form-control-lg text-center" 
+                            id="gradeNilai" 
+                            name="nilai"
+                            min="0" 
+                            max="100" 
+                            required
+                            placeholder="0"
+                            style="font-size: 24px; font-weight: bold;">
+                        <div class="invalid-feedback" id="gradeNilaiFeedback">
+                            Nilai harus antara 0-100
+                        </div>
+                    </div>
+                                        
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">
+                            <i class="bi bi-chat-square-quote text-info me-2"></i>Feedback (Opsional)
+                        </label>
+                        <textarea class="form-control" 
+                                  id="gradeFeedback" 
+                                  name="feedback"
+                                  rows="4" 
+                                  placeholder="Berikan feedback untuk peserta..."
+                                  maxlength="1000"></textarea>
+                        <small class="text-muted">Maksimal 1000 karakter</small>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-success w-100 btn-lg">
+                        <i class="bi bi-check-circle me-2"></i>Simpan Nilai
                     </button>
                 </form>
             </div>
@@ -603,38 +666,40 @@
 .submission-action {
     display: flex;
     gap: 8px;
+    flex-wrap: wrap;
 }
 
 .submission-action .btn {
     flex: 1;
+    min-width: 120px;
 }
 
 .bg-warning-soft {
     background-color: #fef3c7;
-    }
+}
 
-    .pengumuman-item {
-        padding: 12px;
-        background: #f9fafb;
-        border-radius: 10px;
-        margin-bottom: 10px;
-        transition: all 0.2s ease;
-        border-left: 3px solid transparent;
-    }
+.pengumuman-item {
+    padding: 12px;
+    background: #f9fafb;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    transition: all 0.2s ease;
+    border-left: 3px solid transparent;
+}
 
-    .pengumuman-item.penting {
-        border-left-color: #ef4444;
-        background: #fef2f2;
-    }
+.pengumuman-item.penting {
+    border-left-color: #ef4444;
+    background: #fef2f2;
+}
 
-    .pengumuman-item:hover {
-        background: white;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-    }
+.pengumuman-item:hover {
+    background: white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
 
-    .pengumuman-item.expired {
-        opacity: 0.6;
-    }
+.pengumuman-item.expired {
+    opacity: 0.6;
+}
 
 /* Responsive untuk submission */
 @media (max-width: 576px) {
@@ -652,7 +717,14 @@
         height: 40px;
         font-size: 16px;
     }
-
+    
+    .submission-action {
+        flex-direction: column;
+    }
+    
+    .submission-action .btn {
+        width: 100%;
+    }
 }
 </style>
 @endpush
@@ -666,240 +738,216 @@ $(document).ready(function() {
     // Load data awal
     loadParticipants();
     loadTasks();
+    loadPengumuman();
 
     // ============ PENGUMUMAN MANAGEMENT ============
-function loadPengumuman() {
-    $.ajax({
-        url: `/mentor/room/${roomId}/pengumuman`,
-        method: 'GET',
-        success: function(pengumumanList) {
-            if (pengumumanList.length === 0) {
-                $('#pengumumanList').html(`
-                    <div class="text-center py-4">
-                        <i class="bi bi-megaphone display-4 text-muted opacity-25"></i>
-                        <p class="text-muted mt-2 mb-0 small">Belum ada pengumuman</p>
-                    </div>
-                `);
-                return;
-            }
-            
-            let html = '';
-            pengumumanList.slice(0, 3).forEach(function(item) {
-                const pentingClass = item.is_penting ? 'penting' : '';
-                const expiredClass = !item.is_aktif ? 'expired' : '';
-                const pentingBadge = item.is_penting ? '<span class="badge bg-danger text-white ms-1" style="font-size: 9px;">PENTING</span>' : '';
+    function loadPengumuman() {
+        $.ajax({
+            url: `/mentor/room/${roomId}/pengumuman`,
+            method: 'GET',
+            success: function(pengumumanList) {
+                if (pengumumanList.length === 0) {
+                    $('#pengumumanList').html(`
+                        <div class="text-center py-4">
+                            <i class="bi bi-megaphone display-4 text-muted opacity-25"></i>
+                            <p class="text-muted mt-2 mb-0 small">Belum ada pengumuman</p>
+                        </div>
+                    `);
+                    return;
+                }
                 
-                html += `
-                    <div class="pengumuman-item ${pentingClass} ${expiredClass}">
-                        <div class="d-flex justify-content-between align-items-start mb-2">
-                            <h6 class="mb-0 fw-bold text-dark" style="font-size: 13px;">
-                                ${item.judul}${pentingBadge}
-                            </h6>
-                            <div class="dropdown">
-                                <button class="btn btn-sm btn-link text-muted p-0" data-bs-toggle="dropdown">
-                                    <i class="bi bi-three-dots-vertical"></i>
-                                </button>
-                                <ul class="dropdown-menu dropdown-menu-end">
-                                    <li>
-                                        <a class="dropdown-item edit-pengumuman" href="#" data-id="${item.pengumuman_id}">
-                                            <i class="bi bi-pencil me-2"></i>Edit
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item text-danger delete-pengumuman" href="#" data-id="${item.pengumuman_id}">
-                                            <i class="bi bi-trash me-2"></i>Hapus
-                                        </a>
-                                    </li>
-                                </ul>
+                let html = '';
+                pengumumanList.slice(0, 3).forEach(function(item) {
+                    const pentingClass = item.is_penting ? 'penting' : '';
+                    const expiredClass = !item.is_aktif ? 'expired' : '';
+                    const pentingBadge = item.is_penting ? '<span class="badge bg-danger text-white ms-1" style="font-size: 9px;">PENTING</span>' : '';
+                    
+                    html += `
+                        <div class="pengumuman-item ${pentingClass} ${expiredClass}">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <h6 class="mb-0 fw-bold text-dark" style="font-size: 13px;">
+                                    ${item.judul}${pentingBadge}
+                                </h6>
+                                <div class="dropdown">
+                                    <button class="btn btn-sm btn-link text-muted p-0" data-bs-toggle="dropdown">
+                                        <i class="bi bi-three-dots-vertical"></i>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end">
+                                        <li>
+                                            <a class="dropdown-item edit-pengumuman" href="#" data-id="${item.pengumuman_id}">
+                                                <i class="bi bi-pencil me-2"></i>Edit
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item text-danger delete-pengumuman" href="#" data-id="${item.pengumuman_id}">
+                                                <i class="bi bi-trash me-2"></i>Hapus
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <p class="text-muted mb-1 small" style="font-size: 12px;">${item.isi.substring(0, 80)}${item.isi.length > 80 ? '...' : ''}</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-muted" style="font-size: 11px;">
+                                    <i class="bi bi-clock me-1"></i>${item.created_at}
+                                </small>
+                                ${!item.is_aktif ? '<span class="badge bg-secondary" style="font-size: 9px;">Kadaluarsa</span>' : `<span class="badge bg-success" style="font-size: 9px;">${item.durasi_text}</span>`}
                             </div>
                         </div>
-                        <p class="text-muted mb-1 small" style="font-size: 12px;">${item.isi.substring(0, 80)}${item.isi.length > 80 ? '...' : ''}</p>
-                        <div class="d-flex justify-content-between align-items-center">
-                            <small class="text-muted" style="font-size: 11px;">
-                                <i class="bi bi-clock me-1"></i>${item.created_at}
-                            </small>
-                            ${!item.is_aktif ? '<span class="badge bg-secondary" style="font-size: 9px;">Kadaluarsa</span>' : `<span class="badge bg-success" style="font-size: 9px;">${item.durasi_text}</span>`}
-                        </div>
+                    `;
+                });
+                
+                if (pengumumanList.length > 3) {
+                    html += `<p class="text-center text-muted small mb-0">+${pengumumanList.length - 3} pengumuman lainnya</p>`;
+                }
+                
+                $('#pengumumanList').html(html);
+            },
+            error: function() {
+                $('#pengumumanList').html(`
+                    <div class="text-center py-4">
+                        <i class="bi bi-exclamation-triangle text-danger"></i>
+                        <p class="text-muted mt-2 mb-0 small">Gagal memuat pengumuman</p>
                     </div>
-                `;
-            });
-            
-            if (pengumumanList.length > 3) {
-                html += `<p class="text-center text-muted small mb-0">+${pengumumanList.length - 3} pengumuman lainnya</p>`;
+                `);
             }
-            
-            $('#pengumumanList').html(html);
-        },
-        error: function() {
-            $('#pengumumanList').html(`
-                <div class="text-center py-4">
-                    <i class="bi bi-exclamation-triangle text-danger"></i>
-                    <p class="text-muted mt-2 mb-0 small">Gagal memuat pengumuman</p>
-                </div>
-            `);
-        }
-    });
-}
-
-// Submit create pengumuman
-// Ganti bagian AJAX submit create pengumuman dengan ini untuk debugging:
-
-$('#formTambahPengumuman').on('submit', function(e) {
-    e.preventDefault();
-    
-    const formData = new FormData(this);
-    const submitBtn = $(this).find('button[type="submit"]');
-    const originalText = submitBtn.html();
-    
-    // Debug: Log FormData contents
-    console.log('Form Data:');
-    for (let [key, value] of formData.entries()) {
-        console.log(key, value);
+        });
     }
-    
-    $.ajax({
-        url: `/mentor/room/${roomId}/pengumuman`,
-        method: 'POST',
-        data: formData,
-        processData: false,
-        contentType: false,
-        beforeSend: function() {
-            submitBtn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-2"></span>Loading...');
-        },
-        success: function(response) {
-            $('#modalTambahPengumuman').modal('hide');
-            $('#formTambahPengumuman')[0].reset();
-            showToast('success', response.message);
-            loadPengumuman();
-        },
-        error: function(xhr) {
-            // Debug: Log full error response
-            console.error('Error Status:', xhr.status);
-            console.error('Error Response:', xhr.responseJSON);
-            console.error('Error Text:', xhr.responseText);
-            
-            let errorMsg = 'Terjadi kesalahan';
-            
-            if (xhr.status === 422) {
-                // Validation error
-                if (xhr.responseJSON && xhr.responseJSON.errors) {
+
+    // Submit create pengumuman
+    $('#formTambahPengumuman').on('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
+        const submitBtn = $(this).find('button[type="submit"]');
+        const originalText = submitBtn.html();
+        
+        $.ajax({
+            url: `/mentor/room/${roomId}/pengumuman`,
+            method: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            beforeSend: function() {
+                submitBtn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-2"></span>Loading...');
+            },
+            success: function(response) {
+                $('#modalTambahPengumuman').modal('hide');
+                $('#formTambahPengumuman')[0].reset();
+                showToast('success', response.message);
+                loadPengumuman();
+            },
+            error: function(xhr) {
+                let errorMsg = 'Terjadi kesalahan';
+                
+                if (xhr.status === 422 && xhr.responseJSON?.errors) {
+                    errorMsg = Object.values(xhr.responseJSON.errors).flat().join('<br>');
+                } else if (xhr.responseJSON?.message) {
+                    errorMsg = xhr.responseJSON.message;
+                }
+                
+                showToast('error', errorMsg);
+            },
+            complete: function() {
+                submitBtn.prop('disabled', false).html(originalText);
+            }
+        });
+    });
+
+    // Edit pengumuman
+    $(document).on('click', '.edit-pengumuman', function(e) {
+        e.preventDefault();
+        const pengumumanId = $(this).data('id');
+        
+        $.ajax({
+            url: `/mentor/room/${roomId}/pengumuman`,
+            method: 'GET',
+            success: function(pengumumanList) {
+                const pengumuman = pengumumanList.find(p => p.pengumuman_id === pengumumanId);
+                
+                if (pengumuman) {
+                    $('#editPengumumanId').val(pengumuman.pengumuman_id);
+                    $('#editJudul').val(pengumuman.judul);
+                    $('#editIsi').val(pengumuman.isi);
+                    $('#editDurasi').val(pengumuman.durasi_tampil);
+                    $('#editIsPenting').prop('checked', pengumuman.is_penting);
+                    
+                    $('#editPengumumanModal').modal('show');
+                }
+            }
+        });
+    });
+
+    // Submit edit pengumuman
+    $('#editPengumumanForm').on('submit', function(e) {
+        e.preventDefault();
+        
+        const pengumumanId = $('#editPengumumanId').val();
+        const formData = new FormData();
+        
+        formData.append('_method', 'PUT');
+        formData.append('_token', '{{ csrf_token() }}');
+        formData.append('judul', $('#editJudul').val());
+        formData.append('isi', $('#editIsi').val());
+        formData.append('durasi_tampil', $('#editDurasi').val());
+        formData.append('is_penting', $('#editIsPenting').is(':checked') ? 1 : 0);
+        
+        const submitBtn = $(this).find('button[type="submit"]');
+        const originalText = submitBtn.html();
+        
+        $.ajax({
+            url: `/mentor/room/${roomId}/pengumuman/${pengumumanId}`,
+            method: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            beforeSend: function() {
+                submitBtn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-2"></span>Loading...');
+            },
+            success: function(response) {
+                $('#editPengumumanModal').modal('hide');
+                showToast('success', response.message);
+                loadPengumuman();
+            },
+            error: function(xhr) {
+                let errorMsg = 'Terjadi kesalahan';
+                if (xhr.responseJSON?.errors) {
                     errorMsg = Object.values(xhr.responseJSON.errors).flat().join('<br>');
                 }
-            } else if (xhr.status === 500) {
-                // Server error
-                errorMsg = 'Server Error: ' + (xhr.responseJSON?.message || 'Internal Server Error');
-                if (xhr.responseJSON?.exception) {
-                    console.error('Exception:', xhr.responseJSON.exception);
-                }
-            } else if (xhr.status === 403) {
-                errorMsg = 'Unauthorized: Anda tidak memiliki akses';
-            } else if (xhr.responseJSON?.message) {
-                errorMsg = xhr.responseJSON.message;
+                showToast('error', errorMsg);
+            },
+            complete: function() {
+                submitBtn.prop('disabled', false).html(originalText);
             }
-            
-            showToast('error', errorMsg);
-        },
-        complete: function() {
-            submitBtn.prop('disabled', false).html(originalText);
-        }
+        });
     });
-});
 
-// Edit pengumuman
-$(document).on('click', '.edit-pengumuman', function(e) {
-    e.preventDefault();
-    const pengumumanId = $(this).data('id');
-    
-    $.ajax({
-        url: `/mentor/room/${roomId}/pengumuman`,
-        method: 'GET',
-        success: function(pengumumanList) {
-            const pengumuman = pengumumanList.find(p => p.pengumuman_id === pengumumanId);
-            
-            if (pengumuman) {
-                $('#editPengumumanId').val(pengumuman.pengumuman_id);
-                $('#editJudul').val(pengumuman.judul);
-                $('#editIsi').val(pengumuman.isi);
-                $('#editDurasi').val(pengumuman.durasi_tampil);
-                $('#editIsPenting').prop('checked', pengumuman.is_penting);
-                
-                $('#editPengumumanModal').modal('show');
+    // Delete pengumuman
+    $(document).on('click', '.delete-pengumuman', function(e) {
+        e.preventDefault();
+        const pengumumanId = $(this).data('id');
+        
+        if (!confirm('Apakah Anda yakin ingin menghapus pengumuman ini?')) {
+            return;
+        }
+        
+        $.ajax({
+            url: `/mentor/room/${roomId}/pengumuman/${pengumumanId}`,
+            method: 'DELETE',
+            data: {
+                _token: '{{ csrf_token() }}'
+            },
+            success: function(response) {
+                showToast('success', response.message);
+                loadPengumuman();
+            },
+            error: function() {
+                showToast('error', 'Gagal menghapus pengumuman');
             }
-        }
+        });
     });
-});
 
-// Submit edit pengumuman
-$('#editPengumumanForm').on('submit', function(e) {
-    e.preventDefault();
-    
-    const pengumumanId = $('#editPengumumanId').val();
-    const formData = new FormData();
-    
-    formData.append('_method', 'PUT');
-    formData.append('_token', '{{ csrf_token() }}');
-    formData.append('judul', $('#editJudul').val());
-    formData.append('isi', $('#editIsi').val());
-    formData.append('durasi_tampil', $('#editDurasi').val());
-    formData.append('is_penting', $('#editIsPenting').is(':checked') ? 1 : 0);
-    
-    const submitBtn = $(this).find('button[type="submit"]');
-    const originalText = submitBtn.html();
-    
-    $.ajax({
-        url: `/mentor/room/${roomId}/pengumuman/${pengumumanId}`,
-        method: 'POST',
-        data: formData,
-        processData: false,
-        contentType: false,
-        beforeSend: function() {
-            submitBtn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-2"></span>Loading...');
-        },
-        success: function(response) {
-            $('#editPengumumanModal').modal('hide');
-            showToast('success', response.message);
-            loadPengumuman();
-        },
-        error: function(xhr) {
-            let errorMsg = 'Terjadi kesalahan';
-            if (xhr.responseJSON && xhr.responseJSON.errors) {
-                errorMsg = Object.values(xhr.responseJSON.errors).flat().join('<br>');
-            }
-            showToast('error', errorMsg);
-        },
-        complete: function() {
-            submitBtn.prop('disabled', false).html(originalText);
-        }
-    });
-});
-
-// Delete pengumuman
-$(document).on('click', '.delete-pengumuman', function(e) {
-    e.preventDefault();
-    const pengumumanId = $(this).data('id');
-    
-    if (!confirm('Apakah Anda yakin ingin menghapus pengumuman ini?')) {
-        return;
-    }
-    
-    $.ajax({
-        url: `/mentor/room/${roomId}/pengumuman/${pengumumanId}`,
-        method: 'DELETE',
-        data: {
-            _token: '{{ csrf_token() }}'
-        },
-        success: function(response) {
-            showToast('success', response.message);
-            loadPengumuman();
-        },
-        error: function() {
-            showToast('error', 'Gagal menghapus pengumuman');
-        }
-    });
-});
-
-// Panggil loadPengumuman saat page load
-loadPengumuman();
+    // ============ TASK MANAGEMENT ============
     
     // Submit form task baru
     $('#taskForm').on('submit', function(e) {
@@ -925,9 +973,9 @@ loadPengumuman();
             },
             error: function(xhr) {
                 let errorMsg = 'Terjadi kesalahan';
-                if (xhr.responseJSON && xhr.responseJSON.errors) {
+                if (xhr.responseJSON?.errors) {
                     errorMsg = Object.values(xhr.responseJSON.errors).flat().join('<br>');
-                } else if (xhr.responseJSON && xhr.responseJSON.message) {
+                } else if (xhr.responseJSON?.message) {
                     errorMsg = xhr.responseJSON.message;
                 }
                 showToast('error', errorMsg);
@@ -975,7 +1023,7 @@ loadPengumuman();
             },
             error: function(xhr) {
                 let errorMsg = 'Terjadi kesalahan';
-                if (xhr.responseJSON && xhr.responseJSON.errors) {
+                if (xhr.responseJSON?.errors) {
                     errorMsg = Object.values(xhr.responseJSON.errors).flat().join('<br>');
                 }
                 showToast('error', errorMsg);
@@ -1128,138 +1176,159 @@ loadPengumuman();
         `;
     }
     
-    // View task detail
-    // View task detail
-$(document).on('click', '.view-task', function() {
-    const taskId = $(this).data('task-id');
-    
-    $.ajax({
-        url: `/mentor/room/${roomId}/tasks`,
-        method: 'GET',
-        success: function(response) {
-            const allTasks = [...response.active, ...response.expired];
-            const task = allTasks.find(t => t.id === taskId);
-            
-            if (task) {
-                $('#taskDetailJudul').text(task.judul);
-                $('#taskDetailDeskripsi').text(task.deskripsi);
-                $('#taskDetailDeadline').text(task.deadline);
-                $('#submissionCount').text(task.total_submissions);
+    // View task detail - DENGAN TOMBOL BERI NILAI
+    $(document).on('click', '.view-task', function() {
+        const taskId = $(this).data('task-id');
+        
+        // Simpan task ID untuk reload nanti
+        $('#taskDetailModal').data('task-id', taskId);
+        
+        $.ajax({
+            url: `/mentor/room/${roomId}/tasks`,
+            method: 'GET',
+            success: function(response) {
+                const allTasks = [...response.active, ...response.expired];
+                const task = allTasks.find(t => t.id === taskId);
                 
-                // Show file if exists
-                if (task.file_path) {
-                    $('#taskDetailFile').attr('href', `/storage/${task.file_path}`);
-                    $('#taskDetailFileContainer').show();
-                } else {
-                    $('#taskDetailFileContainer').hide();
-                }
-                
-                // Render submissions dengan tampilan baru
-                if (task.submissions.length === 0) {
-                    $('#submissionList').html(`
-                        <div class="text-center py-4">
-                            <i class="bi bi-inbox display-5 text-muted opacity-25"></i>
-                            <p class="text-muted mt-3 mb-0">Belum ada yang mengumpulkan</p>
-                        </div>
-                    `);
-                } else {
-                    let submissionHtml = '';
-                    task.submissions.forEach(function(submission) {
-                        const statusConfig = {
-                            'graded': { color: 'success', icon: 'check-circle-fill', text: 'Dinilai' },
-                            'late': { color: 'warning', icon: 'clock-fill', text: 'Terlambat' },
-                            'pending': { color: 'info', icon: 'hourglass-split', text: 'Pending' }
-                        };
-                        
-                        const status = statusConfig[submission.status] || statusConfig['pending'];
-                        
-                        // Tombol download atau link
-                        let actionButton = '';
-                        if (submission.file_path) {
-                            actionButton = `
-                                <a href="/mentor/room/${roomId}/submission/${submission.submission_id}/download" 
-                                   class="btn btn-sm btn-primary" 
-                                   target="_blank">
-                                    <i class="bi bi-download me-1"></i>Download File
-                                </a>
-                            `;
-                        } else if (submission.link) {
-                            actionButton = `
-                                <a href="${submission.link}" 
-                                   class="btn btn-sm btn-primary" 
-                                   target="_blank" 
-                                   rel="noopener">
-                                    <i class="bi bi-link-45deg me-1"></i>Buka Link
-                                </a>
-                            `;
-                        }
-                        
-                        // Info sections
-                        let infoSections = '';
-                        
-                        if (submission.catatan) {
-                            infoSections += `
-                                <div class="info-item">
-                                    <i class="bi bi-chat-left-text text-primary me-2"></i>
-                                    <span class="info-label">Catatan:</span>
-                                    <span class="info-value">${submission.catatan}</span>
-                                </div>
-                            `;
-                        }
-                        
-                        if (submission.nilai) {
-                            infoSections += `
-                                <div class="info-item">
-                                    <i class="bi bi-star-fill text-warning me-2"></i>
-                                    <span class="info-label">Nilai:</span>
-                                    <span class="info-value fw-bold text-success">${submission.nilai}</span>
-                                </div>
-                            `;
-                        }
-                        
-                        if (submission.feedback) {
-                            infoSections += `
-                                <div class="info-item">
-                                    <i class="bi bi-chat-square-quote text-info me-2"></i>
-                                    <span class="info-label">Feedback:</span>
-                                    <span class="info-value">${submission.feedback}</span>
-                                </div>
-                            `;
-                        }
-                        
-                        submissionHtml += `
-                            <div class="submission-card">
-                                <div class="submission-header">
-                                    <div class="d-flex align-items-center gap-3 flex-grow-1">
-                                        <div class="submission-avatar">
-                                            ${submission.user_nama.charAt(0).toUpperCase()}
-                                        </div>
-                                        <div>
-                                            <h6 class="mb-1 fw-bold text-dark">${submission.user_nama}</h6>
-                                            <small class="text-muted">
-                                                <i class="bi bi-clock me-1"></i>${submission.submitted_at}
-                                            </small>
-                                        </div>
-                                    </div>
-                                    <span class="status-badge status-${status.color}">
-                                        <i class="bi bi-${status.icon} me-1"></i>${status.text}
-                                    </span>
-                                </div>
-                                
-                                ${infoSections ? `<div class="submission-info">${infoSections}</div>` : ''}
-                                
-                                ${actionButton ? `<div class="submission-action">${actionButton}</div>` : ''}
+                if (task) {
+                    $('#taskDetailJudul').text(task.judul);
+                    $('#taskDetailDeskripsi').text(task.deskripsi);
+                    $('#taskDetailDeadline').text(task.deadline);
+                    $('#submissionCount').text(task.total_submissions);
+                    
+                    // Show file if exists
+                    if (task.file_path) {
+                        $('#taskDetailFile').attr('href', `/storage/${task.file_path}`);
+                        $('#taskDetailFileContainer').show();
+                    } else {
+                        $('#taskDetailFileContainer').hide();
+                    }
+                    
+                    // Render submissions dengan tombol nilai
+                    if (task.submissions.length === 0) {
+                        $('#submissionList').html(`
+                            <div class="text-center py-4">
+                                <i class="bi bi-inbox display-5 text-muted opacity-25"></i>
+                                <p class="text-muted mt-3 mb-0">Belum ada yang mengumpulkan</p>
                             </div>
-                        `;
-                    });
-                    $('#submissionList').html(submissionHtml);
+                        `);
+                    } else {
+                        let submissionHtml = '';
+                        task.submissions.forEach(function(submission) {
+                            const statusConfig = {
+                                'graded': { color: 'success', icon: 'check-circle-fill', text: 'Dinilai' },
+                                'late': { color: 'warning', icon: 'clock-fill', text: 'Terlambat' },
+                                'pending': { color: 'info', icon: 'hourglass-split', text: 'Pending' }
+                            };
+                            
+                            const status = statusConfig[submission.status] || statusConfig['pending'];
+                            
+                            // Tombol download atau link
+                            let actionButtons = '';
+                            if (submission.file_path) {
+                                actionButtons += `
+                                    <a href="/mentor/room/${roomId}/submission/${submission.submission_id}/download" 
+                                       class="btn btn-sm btn-outline-primary" 
+                                       target="_blank">
+                                        <i class="bi bi-download me-1"></i>Download
+                                    </a>
+                                `;
+                            } else if (submission.link) {
+                                actionButtons += `
+                                    <a href="${submission.link}" 
+                                       class="btn btn-sm btn-outline-primary" 
+                                       target="_blank" 
+                                       rel="noopener">
+                                        <i class="bi bi-link-45deg me-1"></i>Buka Link
+                                    </a>
+                                `;
+                            }
+                            
+                            // Tombol beri nilai - BAGIAN PENTING!
+                            const gradeButtonText = submission.nilai ? 
+                                `<i class="bi bi-pencil me-1"></i>Edit Nilai (${submission.nilai})` : 
+                                `<i class="bi bi-star me-1"></i>Beri Nilai`;
+                            
+                            actionButtons += `
+                                <button class="btn btn-sm btn-success btn-grade-submission"
+                                        data-submission-id="${submission.submission_id}"
+                                        data-student-name="${submission.user_nama}"
+                                        data-submitted-at="${submission.submitted_at}"
+                                        data-current-nilai="${submission.nilai || ''}"
+                                        data-current-feedback="${submission.feedback || ''}"
+                                        data-status="${submission.status}"> 
+                                    ${gradeButtonText}
+                                </button>
+                            `;
+                            
+                            // Info sections
+                            let infoSections = '';
+                            
+                            if (submission.catatan) {
+                                infoSections += `
+                                    <div class="info-item">
+                                        <i class="bi bi-chat-left-text text-primary me-2"></i>
+                                        <span class="info-label">Catatan:</span>
+                                        <span class="info-value">${submission.catatan}</span>
+                                    </div>
+                                `;
+                            }
+                            
+                            if (submission.nilai) {
+                                infoSections += `
+                                    <div class="info-item">
+                                        <i class="bi bi-star-fill text-warning me-2"></i>
+                                        <span class="info-label">Nilai:</span>
+                                        <span class="info-value fw-bold text-success">${submission.nilai}/100</span>
+                                    </div>
+                                `;
+                            }
+                            
+                            if (submission.feedback) {
+                                infoSections += `
+                                    <div class="info-item">
+                                        <i class="bi bi-chat-square-quote text-info me-2"></i>
+                                        <span class="info-label">Feedback:</span>
+                                        <span class="info-value">${submission.feedback}</span>
+                                    </div>
+                                `;
+                            }
+                            
+                            submissionHtml += `
+                                <div class="submission-card">
+                                    <div class="submission-header">
+                                        <div class="d-flex align-items-center gap-3 flex-grow-1">
+                                            <div class="submission-avatar">
+                                                ${submission.user_nama.charAt(0).toUpperCase()}
+                                            </div>
+                                            <div>
+                                                <h6 class="mb-1 fw-bold text-dark">${submission.user_nama}</h6>
+                                                <small class="text-muted">
+                                                    <i class="bi bi-clock me-1"></i>${submission.submitted_at}
+                                                </small>
+                                            </div>
+                                        </div>
+                                        <span class="status-badge status-${status.color}">
+                                            <i class="bi bi-${status.icon} me-1"></i>${status.text}
+                                        </span>
+                                    </div>
+                                    
+                                    ${infoSections ? `<div class="submission-info">${infoSections}</div>` : ''}
+                                    
+                                    <div class="submission-action">
+                                        ${actionButtons}
+                                    </div>
+                                </div>
+                            `;
+                        });
+                        $('#submissionList').html(submissionHtml);
+                    }
+                    
+                    $('#taskDetailModal').modal('show');
                 }
-                
-                $('#taskDetailModal').modal('show');
             }
-        }
+        });
     });
-});
 
     // Edit task
     $(document).on('click', '.edit-task', function() {
@@ -1325,8 +1394,178 @@ $(document).on('click', '.view-task', function() {
             }
         });
     });
+
+    // ============ GRADING SYSTEM ============
     
-    // Toast notification
+    // Event handler untuk tombol "Beri Nilai" - UPDATE BAGIAN INI
+$(document).on('click', '.btn-grade-submission', function() {
+    const submissionId = $(this).data('submission-id');
+    const studentName = $(this).data('student-name');
+    const submittedAt = $(this).data('submitted-at');
+    const currentNilai = $(this).data('current-nilai') || '';
+    const currentFeedback = $(this).data('current-feedback') || '';
+    const status = $(this).data('status');
+    
+    // Set data ke modal
+    $('#gradeSubmissionId').val(submissionId);
+    $('#gradeStudentName').text(studentName);
+    $('#gradeSubmittedAt').text('Dikumpulkan: ' + submittedAt);
+    $('#gradeStudentAvatar').text(studentName.charAt(0).toUpperCase());
+    
+    // LOGIC UNTUK STATUS LATE
+    const isLate = status === 'late';
+    const maxNilai = isLate ? 85 : 100;
+    
+    // UPDATE LABEL DAN ATRIBUT
+    $('#gradeLabelNilai').html(`
+        <i class="bi bi-trophy text-warning me-2"></i>Nilai (0-${maxNilai})
+    `);
+    
+    // Update atribut max pada input
+    $('#gradeNilai').attr('max', maxNilai);
+    
+    // Update invalid feedback
+    $('#gradeNilaiFeedback').text(`Nilai harus antara 0-${maxNilai}`);
+    
+    // ===== WARNING JIKA TERLAMBAT =====
+    if (isLate) {
+        if ($('#lateWarning').length === 0) {
+            $('#gradeNilai').closest('.mb-4').prepend(`
+                <div class="alert alert-warning mb-3" id="lateWarning">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    <strong>Submission Terlambat!</strong>
+                    Nilai maksimal adalah <strong>85</strong>.
+                </div>
+            `);
+        }
+    } else {
+        $('#lateWarning').remove();
+    }
+
+    // Feedback
+    $('#gradeFeedback').val(currentFeedback);
+
+    // Reset validation
+    $('#gradeForm').removeClass('was-validated');
+    $('#gradeNilai').removeClass('is-invalid');
+
+    // Show modal
+    $('#gradeModal').modal('show');
+});
+
+// REAL-TIME VALIDATION SAAT INPUT
+$('#gradeNilai').on('input', function() {
+    const nilai = parseInt($(this).val());
+    const maxNilai = parseInt($(this).attr('max'));
+    const submitBtn = $('#gradeForm button[type="submit"]');
+    
+    if (nilai > maxNilai) {
+        $(this).addClass('is-invalid');
+        submitBtn.prop('disabled', true);
+        
+        // Update feedback message
+        $('#gradeNilaiFeedback').text(`Nilai maksimal untuk submission ini adalah ${maxNilai}`).addClass('d-block');
+    } else if (nilai < 0 || isNaN(nilai)) {
+        $(this).addClass('is-invalid');
+        submitBtn.prop('disabled', true);
+        
+        $('#gradeNilaiFeedback').text(`Nilai harus antara 0 dan ${maxNilai}`).addClass('d-block');
+    } else {
+        $(this).removeClass('is-invalid');
+        $('#gradeNilaiFeedback').removeClass('d-block');
+        submitBtn.prop('disabled', false);
+    }
+});
+
+// Reset form saat modal ditutup
+$('#gradeModal').on('hidden.bs.modal', function() {
+    $('#gradeForm')[0].reset();
+    $('#gradeForm').removeClass('was-validated');
+    $('#gradeNilai').removeClass('is-invalid');
+    $('#lateWarning').remove();
+    $('#gradeNilaiFeedback').removeClass('d-block');
+    $('#gradeForm button[type="submit"]').prop('disabled', false);
+    
+    // RESET LABEL KE DEFAULT
+    $('#gradeLabelNilai').html(`
+        <i class="bi bi-trophy text-warning me-2"></i>Nilai (0-100)
+    `);
+    $('#gradeNilai').attr('max', 100);
+    $('#gradeNilaiFeedback').text('Nilai harus antara 0-100');
+});
+
+    // Submit form penilaian
+    $('#gradeForm').on('submit', function(e) {
+        e.preventDefault();
+        
+        const submissionId = $('#gradeSubmissionId').val();
+        const nilai = parseInt($('#gradeNilai').val());
+        
+        // Validasi nilai
+        if (nilai < 0 || nilai > 100 || isNaN(nilai)) {
+            $('#gradeNilai').addClass('is-invalid');
+            return;
+        }
+        
+        $('#gradeNilai').removeClass('is-invalid');
+        
+        const formData = new FormData(this);
+        const submitBtn = $(this).find('button[type="submit"]');
+        const originalText = submitBtn.html();
+        
+        $.ajax({
+            url: `/mentor/room/${roomId}/submission/${submissionId}/grade`,
+            method: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            beforeSend: function() {
+                submitBtn.prop('disabled', true).html(
+                    '<span class="spinner-border spinner-border-sm me-2"></span>Menyimpan...'
+                );
+            },
+            success: function(response) {
+                $('#gradeModal').modal('hide');
+                showToast('success', response.message);
+                
+                // Reload tasks untuk update UI
+                loadTasks();
+                
+                // Jika modal detail task sedang terbuka, reload juga
+                if ($('#taskDetailModal').hasClass('show')) {
+                    const activeTaskId = $('#taskDetailModal').data('task-id');
+                    if (activeTaskId) {
+                        setTimeout(() => {
+                            $(`.view-task[data-task-id="${activeTaskId}"]`).trigger('click');
+                        }, 300);
+                    }
+                }
+            },
+            error: function(xhr) {
+                let errorMsg = 'Terjadi kesalahan';
+                
+                if (xhr.status === 422 && xhr.responseJSON?.errors) {
+                    errorMsg = Object.values(xhr.responseJSON.errors).flat().join('<br>');
+                } else if (xhr.responseJSON?.message) {
+                    errorMsg = xhr.responseJSON.message;
+                }
+                
+                showToast('error', errorMsg);
+            },
+            complete: function() {
+                submitBtn.prop('disabled', false).html(originalText);
+            }
+        });
+    });
+
+    // Reset form saat modal ditutup
+    $('#gradeModal').on('hidden.bs.modal', function() {
+        $('#gradeForm')[0].reset();
+        $('#gradeForm').removeClass('was-validated');
+        $('#gradeNilai').removeClass('is-invalid');
+    });
+    
+    // ============ TOAST NOTIFICATION ============
     function showToast(type, message) {
         const bgColor = type === 'success' ? '#10b981' : '#ef4444';
         const icon = type === 'success' ? 'check-circle-fill' : 'exclamation-triangle-fill';
@@ -1355,7 +1594,6 @@ $(document).on('click', '.view-task', function() {
         }, 5000);
     }
 });
-
 
 </script>
 @endpush
