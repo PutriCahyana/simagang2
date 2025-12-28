@@ -55,7 +55,7 @@
                             <th>Keterangan</th>
                             <th>Room</th>
                             <th>Status</th>
-                            <th>Aksi</th>
+                            <th class="text-center" style="width: 100px;">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -66,12 +66,13 @@
                                 <td>{{ $logbook->jam_masuk }} - {{ $logbook->jam_keluar }}</td>
                                 <td>{{ Str::limit($logbook->aktivitas, 50) }}</td>
                                 <td>
-                                    <span class="badge 
-                                        @if($logbook->keterangan == 'offline_kantor') bg-primary
-                                        @elseif($logbook->keterangan == 'online') bg-info
-                                        @elseif($logbook->keterangan == 'sakit') bg-warning
-                                        @elseif($logbook->keterangan == 'izin') bg-secondary
-                                        @else bg-danger
+                                    <span class="badge rounded-pill shadow-sm px-3 py-2 text-white" 
+                                          style="font-size: 0.85rem; font-weight: 600;
+                                        @if($logbook->keterangan == 'offline_kantor') background-color: #0d6efd;
+                                        @elseif($logbook->keterangan == 'online') background-color: #0dcaf0;
+                                        @elseif($logbook->keterangan == 'sakit') background-color: #ffc107;
+                                        @elseif($logbook->keterangan == 'izin') background-color: #6c757d;
+                                        @else background-color: #dc3545;
                                         @endif">
                                         {{ $logbook->keterangan_label }}
                                     </span>
@@ -79,42 +80,48 @@
                                 <td>{{ $logbook->room->nama_room }}</td>
                                 <td>
                                     @if($logbook->is_approved)
-                                        <span class="badge bg-success">
-                                            <i class="bi bi-check-circle"></i> Approved
+                                        <span class="badge rounded-pill bg-success shadow-sm px-3 py-2 text-white" style="font-size: 0.85rem; font-weight: 600;">
+                                            <i class="bi bi-check-circle-fill me-1"></i> Approved
                                         </span>
                                         <small class="d-block text-muted mt-1">
                                             oleh {{ $logbook->approver->nama }}
                                         </small>
                                     @else
-                                        <span class="badge bg-warning">
-                                            <i class="bi bi-clock"></i> Pending
+                                        <span class="badge rounded-pill shadow-sm px-3 py-2 text-white" style="font-size: 0.85rem; font-weight: 600; background-color: #ffc107;">
+                                            <i class="bi bi-clock-fill me-1"></i> Pending
                                         </span>
                                     @endif
                                 </td>
-                                <td>
-                                    @if(!$logbook->is_approved)
-                                        <a href="{{ route('peserta.logbook.edit', $logbook->id) }}" 
-                                           class="btn btn-sm btn-outline-primary">
-                                            <i class="bi bi-pencil"></i>
-                                        </a>
-                                        <form action="{{ route('peserta.logbook.destroy', $logbook->id) }}" 
-                                              method="POST" class="d-inline"
-                                              onsubmit="return confirm('Yakin ingin menghapus logbook ini?')">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-sm btn-outline-danger">
-                                                <i class="bi bi-trash"></i>
-                                            </button>
-                                        </form>
-                                    @else
-                                        <span class="text-muted">-</span>
-                                    @endif
+                                <td class="text-center">
+                                    <div class="d-flex justify-content-center gap-1">
+                                        @if(!$logbook->is_approved)
+                                            <a href="{{ route('peserta.logbook.edit', $logbook->id) }}" 
+                                               class="btn btn-sm btn-outline-primary shadow-sm"
+                                               title="Edit">
+                                                <i class="bi bi-pencil"></i>
+                                            </a>
+                                            <form action="{{ route('peserta.logbook.destroy', $logbook->id) }}" 
+                                                  method="POST" class="d-inline"
+                                                  onsubmit="return confirm('Yakin ingin menghapus logbook ini?')">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" 
+                                                        class="btn btn-sm btn-outline-danger shadow-sm"
+                                                        title="Hapus">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </form>
+                                        @else
+                                            <span class="text-muted">-</span>
+                                        @endif
+                                    </div>
                                 </td>
                             </tr>
                         @empty
                             <tr>
                                 <td colspan="8" class="text-center py-4 text-muted">
-                                    Belum ada logbook. <a href="{{ route('peserta.logbook.create') }}">Tambah sekarang</a>
+                                    <i class="bi bi-inbox" style="font-size: 2rem;"></i>
+                                    <p class="mb-0 mt-2">Belum ada logbook. <a href="{{ route('peserta.logbook.create') }}">Tambah sekarang</a></p>
                                 </td>
                             </tr>
                         @endforelse

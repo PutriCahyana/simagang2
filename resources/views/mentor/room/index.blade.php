@@ -16,6 +16,9 @@
         
         <!-- Include modal create -->
         @include('mentor.room.create')
+        
+        <!-- Include modal edit -->
+        @include('mentor.room.edit')
     </div>
     
     <div class="card-body">
@@ -51,11 +54,11 @@
                         <div class="mt-3">
                             <div class="d-inline-flex align-items-center bg-light border rounded px-3 py-2">
                                 <span class="text-gray-600 mr-2">Kode Room:</span>
-                                <span id="code-{{ $room->id }}" class="font-weight-bold text-primary mr-3">{{ $room->code }}</span>
+                                <span id="code-{{ $room->room_id }}" class="font-weight-bold text-primary mr-3">{{ $room->code }}</span>
                                 <button 
                                     type="button" 
                                     class="btn btn-sm btn-outline-primary"
-                                    onclick="copyCode('{{ $room->id }}')"
+                                    onclick="copyCode('{{ $room->room_id }}')"
                                     title="Salin kode"
                                 >
                                     <i class="fas fa-copy"></i>
@@ -70,12 +73,12 @@
                             <i class="fas fa-eye mr-2"></i>
                             Lihat Detail
                         </a>
-                        <a href="#" class="btn-action btn-action-primary mb-2 w-100">
+                        <button type="button" class="btn-action btn-action-primary mb-2 w-100" onclick="editRoom('{{ $room->room_id }}')">
                             <i class="fas fa-edit mr-2"></i>
                             Edit Room
-                        </a>
-                        <form action="#" method="POST" class="w-100" 
-                              onsubmit="return confirm('Yakin ingin hapus room ini?')">
+                        </button>
+                        <form action="{{ route('mentor.room.destroy', $room->room_id) }}" method="POST" class="w-100" 
+                            onsubmit="return confirm('Yakin ingin hapus room ini?')">
                             @csrf
                             @method('DELETE')
                             <button type="submit" class="btn-action btn-action-danger w-100">
@@ -106,20 +109,47 @@
 function copyCode(roomId) {
     const codeElement = document.getElementById('code-' + roomId);
     const code = codeElement.textContent;
+    const button = event.currentTarget;
     
-    // Copy to clipboard
     navigator.clipboard.writeText(code).then(function() {
-        // Show success feedback
-        const originalHTML = codeElement.parentElement.innerHTML;
-        codeElement.parentElement.innerHTML = '<span class="text-success"><i class="fas fa-check mr-1"></i>Tersalin!</span>';
+        const originalHTML = button.innerHTML;
         
-        // Reset after 2 seconds
+        button.innerHTML = '<i class="fas fa-check"></i>';
+        button.classList.remove('btn-outline-primary');
+        button.classList.add('btn-success');
+        button.disabled = true;
+        
         setTimeout(function() {
-            codeElement.parentElement.innerHTML = originalHTML;
+            button.innerHTML = originalHTML;
+            button.classList.remove('btn-success');
+            button.classList.add('btn-outline-primary');
+            button.disabled = false;
         }, 2000);
     }).catch(function(err) {
         alert('Gagal menyalin kode');
     });
+}
+
+function editRoom(roomId) {
+    // Fetch data room via AJAX
+    fetch(`/mentor/room/${roomId}/edit`)
+        .then(response => response.json())
+        .then(data => {
+            // Isi form dengan data room
+            document.getElementById('edit_room_id').value = data.room_id;
+            document.getElementById('edit_nama_room').value = data.nama_room;
+            document.getElementById('edit_deskripsi').value = data.deskripsi || '';
+            
+            // Set action URL form
+            document.getElementById('editRoomForm').action = `/mentor/room/${data.room_id}`;
+            
+            // Tampilkan modal
+            $('#editRoomModal').modal('show');
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Gagal memuat data room');
+        });
 }
 </script>
 @endpush

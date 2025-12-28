@@ -1,0 +1,118 @@
+body {
+            background-color: #f8f9fc;
+            /* padding: 20px; */
+        }
+        
+        .countdown-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            border-radius: 10px;
+        }
+        
+        .countdown-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+        
+        .countdown-circle {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 15px;
+            position: relative;
+        }
+        
+        .countdown-circle svg {
+            transform: rotate(-90deg);
+        }
+        
+        .countdown-circle circle {
+            fill: none;
+            stroke-width: 8;
+        }
+        
+        .countdown-circle .bg {
+            stroke: rgba(255,255,255,0.2);
+        }
+        
+        .countdown-circle .progress {
+            stroke: #a8ff78;
+            stroke-linecap: round;
+        }
+        
+        .countdown-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .room-card {
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 4px solid;
+            border-radius: 8px;
+        }
+        
+        .room-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15);
+        }
+        
+        .room-card.technical {
+            border-left-color: #4e73df;
+        }
+        
+        .room-card.marketing {
+            border-left-color: #1cc88a;
+        }
+        
+        .room-card.finance {
+            border-left-color: #36b9cc;
+        }
+        
+        .room-card.hr {
+            border-left-color: #f6c23e;
+        }
+        
+        .chart-container {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 0.15rem 1.75rem 0 rgba(58,59,69,.15);
+            margin-bottom: 20px;
+        }
+        
+        .chart-bar {
+            cursor: pointer;
+            transition: opacity 0.3s ease;
+        }
+        
+        .chart-bar:hover {
+            opacity: 0.8;
+        }
+        
+        .table-hover tbody tr:hover {
+            background-color: #f8f9fc;
+            cursor: pointer;
+        }
+        
+        .page-heading {
+            margin-bottom: 30px;
+        }
+        
+        .section-title {
+            color: #5a5c69;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+        
+        .card {
+            box-shadow: 0 0.15rem 1.75rem 0 rgba(58,59,69,.15);
+        }
+
+        

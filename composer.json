@@ -9,9 +9,8 @@
         "php": "^8.2",
         "laravel/framework": "^12.0",
         "laravel/tinker": "^2.10.1",
-        "maatwebsite/excel": "^1.1",
         "phenx/php-font-lib": "0.5",
-        "phpoffice/phpspreadsheet": "^5.0",
+        "maatwebsite/excel": "^4.0@dev",
         "spatie/laravel-pdf": "^1.8"
     },
     "require-dev": {
@@ -74,6 +73,6 @@
             "php-http/discovery": true
         }
     },
-    "minimum-stability": "stable",
+    "minimum-stability": "dev",
     "prefer-stable": true
 }

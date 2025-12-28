@@ -1,116 +1,568 @@
+/* Modern Dashboard Styles - Revised */
+:root {
+    --primary: #60a5fa;
+    --primary-dark: #3b82f6;
+    --primary-light: #93c5fd;
+    --secondary: #a78bfa;
+    --success: #34d399;
+    --warning: #fbbf24;
+    --danger: #f87171;
+    --info: #22d3ee;
+    --light: #f8fafc;
+    --dark: #1e293b;
+    --card-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    --card-shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
 body {
-            background-color: #f8f9fc;
-            /* padding: 20px; */
-        }
-        
-        .countdown-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            cursor: pointer;
-            transition: transform 0.3s ease;
-            border-radius: 10px;
-        }
-        
-        .countdown-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
-        }
-        
-        .countdown-circle {
-            width: 120px;
-            height: 120px;
-            margin: 0 auto 15px;
-            position: relative;
-        }
-        
-        .countdown-circle svg {
-            transform: rotate(-90deg);
-        }
-        
-        .countdown-circle circle {
-            fill: none;
-            stroke-width: 8;
-        }
-        
-        .countdown-circle .bg {
-            stroke: rgba(255,255,255,0.2);
-        }
-        
-        .countdown-circle .progress {
-            stroke: #a8ff78;
-            stroke-linecap: round;
-        }
-        
-        .countdown-text {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 24px;
-            font-weight: bold;
-        }
-        
-        .room-card {
-            cursor: pointer;
-            transition: all 0.3s ease;
-            border-left: 4px solid;
-            border-radius: 8px;
-        }
-        
-        .room-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15);
-        }
-        
-        .room-card.technical {
-            border-left-color: #4e73df;
-        }
-        
-        .room-card.marketing {
-            border-left-color: #1cc88a;
-        }
-        
-        .room-card.finance {
-            border-left-color: #36b9cc;
-        }
-        
-        .room-card.hr {
-            border-left-color: #f6c23e;
-        }
-        
-        .chart-container {
-            background: white;
-            border-radius: 8px;
-            padding: 20px;
-            box-shadow: 0 0.15rem 1.75rem 0 rgba(58,59,69,.15);
-            margin-bottom: 20px;
-        }
-        
-        .chart-bar {
-            cursor: pointer;
-            transition: opacity 0.3s ease;
-        }
-        
-        .chart-bar:hover {
-            opacity: 0.8;
-        }
-        
-        .table-hover tbody tr:hover {
-            background-color: #f8f9fc;
-            cursor: pointer;
-        }
-        
-        .page-heading {
-            margin-bottom: 30px;
-        }
-        
-        .section-title {
-            color: #5a5c69;
-            font-weight: 600;
-            margin-bottom: 15px;
-        }
-        
-        .card {
-            box-shadow: 0 0.15rem 1.75rem 0 rgba(58,59,69,.15);
-        }
+    background: linear-gradient(135deg, #e0f2fe 0%, #ddd6fe 100%);
+    min-height: 100vh;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+.container-fluid {
+    padding: 1.5rem;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* Mentor Header - Compact dengan warna pastel */
+.mentor-header {
+    background: linear-gradient(135deg, #dbeafe 0%, #e0f2fe 100%);
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: var(--card-shadow);
+    border: 1px solid rgba(96, 165, 250, 0.2);
+}
+
+.mentor-header h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 0.25rem;
+}
+
+.mentor-header p {
+    color: #64748b;
+    font-size: 0.95rem;
+    margin: 0;
+}
+
+.stats-card {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    color: white;
+    padding: 1rem 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(96, 165, 250, 0.3);
+}
+
+.stats-label {
+    font-size: 0.75rem;
+    opacity: 0.95;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.stats-number {
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin-top: 0.25rem;
+}
+
+/* Section Title */
+.section-title {
+    color: var(--dark);
+    font-weight: 600;
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+}
+
+.text-muted.small {
+    color: #64748b !important;
+    font-size: 0.85rem;
+}
+
+/* Room Cards - Warna MUDA BANGET, tiap room beda */
+.room-card {
+    background: white;
+    border: none;
+    border-radius: 12px;
+    box-shadow: var(--card-shadow);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+    position: relative;
+}
+
+/* Warna super muda untuk setiap room */
+.room-card:nth-child(1) {
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+}
+
+.room-card:nth-child(2) {
+    background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+}
+
+.room-card:nth-child(3) {
+    background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+}
+
+.room-card:nth-child(4) {
+    background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%);
+}
+
+.room-card:nth-child(5) {
+    background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
+}
+
+.room-card:nth-child(6) {
+    background: linear-gradient(135deg, #fdf2f8 0%, #fce7f3 100%);
+}
+
+.room-card::before {
+    display: none;
+}
+
+.room-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--card-shadow-hover);
+}
+
+.room-card .card-body {
+    padding: 1rem !important;
+}
+
+.room-card .text-xs {
+    font-size: 0.7rem;
+    letter-spacing: 0.3px;
+}
+
+.room-card .h5 {
+    font-size: 1.25rem;
+    color: var(--dark);
+}
+
+.room-card .text-primary {
+    color: var(--primary) !important;
+}
+
+.room-card .fa-laptop-code {
+    font-size: 2rem !important;
+    opacity: 0.15 !important;
+}
+
+/* Countdown Cards - PUTIH aja, chart lingkarannya yang warna-warni */
+.countdown-card {
+    background: white;
+    border: none;
+    border-radius: 12px;
+    box-shadow: var(--card-shadow);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+    position: relative;
+}
+
+.countdown-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--card-shadow-hover);
+}
+
+.countdown-card .card-body {
+    padding: 1.5rem !important;
+}
+
+.countdown-circle {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    margin: 0 auto 1rem;
+}
+
+.countdown-circle svg {
+    transform: rotate(-90deg);
+    width: 100%;
+    height: 100%;
+}
+
+.countdown-circle circle.bg {
+    fill: none;
+    stroke: #f1f5f9;
+    stroke-width: 8;
+}
+
+.countdown-circle circle.progress {
+    fill: none;
+    stroke: #60a5fa;
+    stroke-width: 8;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 1s ease;
+    filter: drop-shadow(0 2px 4px rgba(96, 165, 250, 0.4));
+}
+
+/* Warna progress ring beda-beda per card */
+.countdown-card:nth-child(1) .countdown-circle circle.progress {
+    stroke: #60a5fa;
+    filter: drop-shadow(0 2px 4px rgba(96, 165, 250, 0.4));
+}
+
+.countdown-card:nth-child(2) .countdown-circle circle.progress {
+    stroke: #34d399;
+    filter: drop-shadow(0 2px 4px rgba(52, 211, 153, 0.4));
+}
+
+.countdown-card:nth-child(3) .countdown-circle circle.progress {
+    stroke: #a78bfa;
+    filter: drop-shadow(0 2px 4px rgba(167, 139, 250, 0.4));
+}
+
+.countdown-card:nth-child(4) .countdown-circle circle.progress {
+    stroke: #fb923c;
+    filter: drop-shadow(0 2px 4px rgba(251, 146, 60, 0.4));
+}
+
+.countdown-card:nth-child(5) .countdown-circle circle.progress {
+    stroke: #f472b6;
+    filter: drop-shadow(0 2px 4px rgba(244, 114, 182, 0.4));
+}
+
+.countdown-card:nth-child(6) .countdown-circle circle.progress {
+    stroke: #fbbf24;
+    filter: drop-shadow(0 2px 4px rgba(251, 191, 36, 0.4));
+}
+
+.countdown-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 1.75rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Text warna matching dengan ring */
+.countdown-card:nth-child(2) .countdown-text {
+    background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.countdown-card:nth-child(3) .countdown-text {
+    background: linear-gradient(135deg, #a78bfa 0%, #8b5cf6 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.countdown-card:nth-child(4) .countdown-text {
+    background: linear-gradient(135deg, #fb923c 0%, #f97316 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.countdown-card:nth-child(5) .countdown-text {
+    background: linear-gradient(135deg, #f472b6 0%, #ec4899 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.countdown-card:nth-child(6) .countdown-text {
+    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.countdown-card h5 {
+    font-weight: 600;
+    color: var(--dark);
+    font-size: 1rem;
+}
+
+.countdown-card p {
+    color: #64748b;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.badge-light {
+    background-color: #e0f2fe;
+    color: var(--primary-dark);
+    padding: 0.35rem 0.85rem;
+    border-radius: 50px;
+    font-weight: 500;
+    font-size: 0.75rem;
+}
+
+/* Chart Container - Compact with Pastel Accent */
+.chart-container {
+    background: white;
+    border-radius: 12px;
+    padding: 1.25rem;
+    box-shadow: var(--card-shadow);
+    height: 100%;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Subtle pastel accent di pojok */
+.chart-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 150px;
+    height: 150px;
+    background: radial-gradient(circle at top right, rgba(96, 165, 250, 0.1) 0%, transparent 70%);
+    pointer-events: none;
+}
+
+.chart-container:hover {
+    box-shadow: var(--card-shadow-hover);
+}
+
+.chart-container h6 {
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.chart-container .text-primary {
+    color: var(--primary) !important;
+}
+
+.chart-container .text-success {
+    color: var(--success) !important;
+}
+
+.chart-container .text-info {
+    color: var(--info) !important;
+}
+
+.chart-container canvas {
+    max-height: 280px !important;
+}
+
+/* Quick Stats - Compact with Icon Background Colors */
+.chart-container .row .col-md-3 {
+    border-right: 1px solid #e5e7eb;
+}
+
+.chart-container .row .col-md-3:last-child {
+    border-right: none;
+}
+
+.chart-container .p-3 {
+    padding: 1rem !important;
+    transition: all 0.3s ease;
+    border-radius: 8px;
+}
+
+/* Pastel background untuk setiap stat */
+.chart-container .p-3:nth-child(1) {
+    background: linear-gradient(135deg, rgba(96, 165, 250, 0.08) 0%, rgba(96, 165, 250, 0.02) 100%);
+}
+
+.chart-container .p-3:nth-child(2) {
+    background: linear-gradient(135deg, rgba(52, 211, 153, 0.08) 0%, rgba(52, 211, 153, 0.02) 100%);
+}
+
+.chart-container .p-3:nth-child(3) {
+    background: linear-gradient(135deg, rgba(251, 191, 36, 0.08) 0%, rgba(251, 191, 36, 0.02) 100%);
+}
+
+.chart-container .p-3:nth-child(4) {
+    background: linear-gradient(135deg, rgba(34, 211, 238, 0.08) 0%, rgba(34, 211, 238, 0.02) 100%);
+}
+
+.chart-container .p-3:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.chart-container .p-3 .fa-2x {
+    font-size: 1.75rem;
+}
+
+.chart-container .p-3 h4 {
+    font-weight: 700;
+    color: var(--dark);
+    font-size: 1.75rem;
+}
+
+.chart-container .p-3 small {
+    font-size: 0.8rem;
+}
+
+/* Modal Styling */
+.modal-content {
+    border: none;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.modal-header {
+    border-bottom: none;
+    padding: 1.25rem 1.5rem;
+}
+
+.modal-header.bg-primary {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%) !important;
+}
+
+.modal-header.bg-info {
+    background: linear-gradient(135deg, var(--info) 0%, #06b6d4 100%) !important;
+}
+
+.modal-title {
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.modal-body {
+    padding: 1.5rem;
+}
+
+/* Table Styling */
+.table {
+    margin-bottom: 0;
+    font-size: 0.9rem;
+}
+
+.table thead th {
+    border-bottom: 2px solid #e5e7eb;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.7rem;
+    letter-spacing: 0.5px;
+    color: #64748b;
+    padding: 0.75rem;
+}
+
+.table tbody tr {
+    transition: all 0.2s ease;
+}
+
+.table tbody tr:hover {
+    background-color: #f8fafc;
+    transform: scale(1.005);
+}
+
+.table td {
+    padding: 0.75rem;
+    vertical-align: middle;
+}
+
+.table a.text-primary {
+    color: var(--primary) !important;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.table a.text-primary:hover {
+    color: var(--primary-dark) !important;
+    text-decoration: underline;
+}
+
+/* Badge Styling */
+.badge {
+    padding: 0.4rem 0.85rem;
+    border-radius: 50px;
+    font-weight: 500;
+    font-size: 0.7rem;
+}
+
+.badge-warning {
+    background-color: #fef3c7;
+    color: #92400e;
+}
+
+.badge-success {
+    background-color: #d1fae5;
+    color: #065f46;
+}
+
+.badge-info {
+    background-color: #cffafe;
+    color: #164e63;
+}
+
+.badge-secondary {
+    background-color: #e5e7eb;
+    color: #374151;
+}
+
+/* Row spacing */
+.row.mb-4 {
+    margin-bottom: 1.5rem !important;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .container-fluid {
+        padding: 1rem;
+    }
+    
+    .mentor-header h1 {
+        font-size: 1.25rem;
+    }
+    
+    .stats-card {
+        margin-top: 1rem;
+    }
+    
+    .stats-number {
+        font-size: 1.5rem;
+    }
+    
+    .chart-container .row .col-md-3 {
+        border-right: none;
+        border-bottom: 1px solid #e5e7eb;
+        padding-bottom: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .chart-container .row .col-md-3:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+    }
+}
+
+/* Animation - Faster */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.room-card,
+.countdown-card,
+.chart-container {
+    animation: fadeInUp 0.4s ease-out backwards;
+}
+
+.room-card:nth-child(1), .countdown-card:nth-child(1) { animation-delay: 0.05s; }
+.room-card:nth-child(2), .countdown-card:nth-child(2) { animation-delay: 0.1s; }
+.room-card:nth-child(3), .countdown-card:nth-child(3) { animation-delay: 0.15s; }
+
+/* Chart.js Custom Styles */
+.chartjs-render-monitor {
+    animation: fadeInUp 0.6s ease-out;
+}
+

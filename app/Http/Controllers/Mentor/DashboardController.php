@@ -56,7 +56,7 @@ class DashboardController extends Controller
         // Data peserta dengan detail
         $pesertaData = $allPeserta->map(function($user) use ($rooms) {
             $pesertaDetail = $user->peserta;
-            $sisaHari = (int) Carbon::now()->diffInDays($pesertaDetail->periode_end, false);
+            $sisaHari = max(0, (int) Carbon::now()->diffInDays($pesertaDetail->periode_end, false));
             
             // Cari room peserta ini (ambil yang pertama kalau ada di banyak room)
             $userRoom = $rooms->first(function($room) use ($user) {
@@ -140,6 +140,26 @@ class DashboardController extends Controller
             'stats'
         ));
     }
+
+    public function showPeserta($user_id)
+    {
+        // Ambil data peserta dengan relasi yang diperlukan
+        $peserta = \App\Models\User::where('id', $user_id)
+            ->where('role', 'peserta')
+            ->with(['peserta', 'joinedRooms'])
+            ->firstOrFail();
+        
+        // Optional: Validasi bahwa mentor hanya bisa lihat peserta di room mereka
+        $mentorRoomIds = Auth::user()->mentor->rooms->pluck('room_id');
+        $pesertaRoomIds = $peserta->joinedRooms->pluck('room_id');
+        
+        // Cek apakah ada irisan antara room mentor dan room peserta
+        if ($mentorRoomIds->intersect($pesertaRoomIds)->isEmpty()) {
+            abort(403, 'Anda tidak memiliki akses ke peserta ini');
+        }
+        
+        return view('mentor.home.peserta', compact('peserta'));
+    }
     
     // API untuk modal detail peserta per periode
     public function getPeriodDetail($periode)
@@ -163,8 +183,9 @@ class DashboardController extends Controller
                            $user->peserta->periode_end >= Carbon::now();
                 })
                 ->map(function($user) {
-                    $sisaHari = Carbon::now()->diffInDays($user->peserta->periode_end, false);
+                    $sisaHari = (int) Carbon::now()->diffInDays($user->peserta->periode_end, false);
                     return [
+                        'id' => $user->id,
                         'nama' => $user->nama,
                         'institut' => $user->peserta->institut,
                         'sisaHari' => max(0, $sisaHari),
@@ -197,8 +218,9 @@ class DashboardController extends Controller
                                $user->peserta->periode_end >= Carbon::now();
                     })
                     ->map(function($user) {
-                        $sisaHari = Carbon::now()->diffInDays($user->peserta->periode_end, false);
+                        $sisaHari = (int) Carbon::now()->diffInDays($user->peserta->periode_end, false);
                         return [
+                            'id' => $user->id,
                             'nama' => $user->nama,
                             'periode' => Carbon::parse($user->peserta->periode_start)->format('F') . ' - ' . 
                                        Carbon::parse($user->peserta->periode_end)->format('F'),
@@ -217,6 +239,7 @@ class DashboardController extends Controller
                     })
                     ->map(function($user) {
                         return [
+                            'id' => $user->id,
                             'nama' => $user->nama,
                             'periode' => Carbon::parse($user->peserta->periode_start)->format('F Y') . ' - ' . 
                                        Carbon::parse($user->peserta->periode_end)->format('F Y'),
@@ -248,8 +271,9 @@ class DashboardController extends Controller
                     return $user->peserta && $user->peserta->periode_end >= Carbon::now();
                 })
                 ->map(function($user) use ($room) {
-                    $sisaHari = Carbon::now()->diffInDays($user->peserta->periode_end, false);
+                    $sisaHari = (int) Carbon::now()->diffInDays($user->peserta->periode_end, false);
                     return [
+                        'id' => $user->id,
                         'nama' => $user->nama,
                         'institut' => $user->peserta->institut,
                         'periode' => Carbon::parse($user->peserta->periode_start)->format('F') . ' - ' . 
@@ -281,8 +305,9 @@ class DashboardController extends Controller
                 return $user->peserta && $user->peserta->periode_end >= Carbon::now();
             })
             ->map(function($user) {
-                $sisaHari = Carbon::now()->diffInDays($user->peserta->periode_end, false);
+                $sisaHari = (int) Carbon::now()->diffInDays($user->peserta->periode_end, false);
                 return [
+                    'id' => $user->id,
                     'nama' => $user->nama,
                     'institut' => $user->peserta->institut,
                     'periode' => Carbon::parse($user->peserta->periode_start)->format('F') . ' - ' . 

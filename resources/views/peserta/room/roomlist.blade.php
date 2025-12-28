@@ -10,7 +10,7 @@
                     <i class="fas fa-book-reader"></i>
                     My Rooms
                 </h1>
-                <button class="btn btn-primary" data-toggle="modal" data-target="#joinRoomModal">
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#joinRoomModal">
                     <i class="fas fa-plus mr-2"></i>
                     Join Room
                 </button>
@@ -67,7 +67,7 @@
                             </div>
                         </div>
                         <div class="col-auto">
-                            <a href="#" class="btn btn-primary btn-sm rounded-circle btn-arrow">
+                            <a href="{{ route('peserta.room.show', $room->room_id) }}" class="btn btn-primary btn-sm rounded-circle btn-arrow">
                                 <i class="fas fa-arrow-right"></i>
                             </a>
                         </div>
@@ -84,7 +84,7 @@
                         </div>
                         <h5 class="text-gray-700 mb-2">Kamu belum join room apapun</h5>
                         <p class="text-muted mb-4">Masukkan kode room untuk bergabung dengan kelas</p>
-                        <button class="btn btn-primary" data-toggle="modal" data-target="#joinRoomModal">
+                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#joinRoomModal">
                             <i class="fas fa-plus mr-2"></i>
                             Join Room Sekarang
                         </button>
@@ -101,7 +101,7 @@
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h6 class="mb-0 font-weight-bold">
-                            <span id="currentMonth">Nov 2020</span>
+                            <span id="currentMonth">Nov 2025</span>
                         </h6>
                         <div class="btn-group btn-group-sm" role="group">
                             <button type="button" class="btn btn-outline-secondary" onclick="previousMonth()">
@@ -130,7 +130,18 @@
                 </div>
             </div>
 
-            <!-- Online Users (Optional) -->
+            <!-- Task Tooltip -->
+            <div class="card shadow-sm border-0" id="taskTooltip" style="display: none;">
+                <div class="card-body">
+                    <button type="button" class="close" onclick="closeTaskTooltip()" style="position: absolute; right: 10px; top: 10px;">
+                        <span>&times;</span>
+                    </button>
+                    <h6 class="mb-3 font-weight-bold">Tasks on <span id="selectedDate"></span></h6>
+                    <div id="taskList"></div>
+                </div>
+            </div>
+
+            <!-- Recent Activity -->
             <div class="card shadow-sm border-0">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center mb-3">
@@ -138,24 +149,24 @@
                         <a href="#" class="text-primary small">See all</a>
                     </div>
                     <div class="activity-list">
-                        <div class="activity-item">
-                            <div class="activity-icon bg-primary">
-                                <i class="fas fa-tasks"></i>
+                        @forelse ($activities ?? [] as $activity)
+                            <div class="activity-item">
+                                <div class="activity-icon bg-{{ $activity->type == 'task_added' ? 'primary' : 'success' }}">
+                                    <i class="fas fa-{{ $activity->type == 'task_added' ? 'tasks' : 'check' }}"></i>
+                                </div>
+                                <div class="activity-content">
+                                    <p class="mb-0 small">
+                                        {{ $activity->description }}
+                                        @if($activity->room)
+                                            in <strong>{{ $activity->room->nama_room }}</strong>
+                                        @endif
+                                    </p>
+                                    <span class="text-muted" style="font-size: 11px;">{{ $activity->created_at->diffForHumans() }}</span>
+                                </div>
                             </div>
-                            <div class="activity-content">
-                                <p class="mb-0 small"><strong>New Task</strong> added in Operating System</p>
-                                <span class="text-muted" style="font-size: 11px;">2 hours ago</span>
-                            </div>
-                        </div>
-                        <div class="activity-item">
-                            <div class="activity-icon bg-success">
-                                <i class="fas fa-check"></i>
-                            </div>
-                            <div class="activity-content">
-                                <p class="mb-0 small">Task completed in <strong>AI Course</strong></p>
-                                <span class="text-muted" style="font-size: 11px;">5 hours ago</span>
-                            </div>
-                        </div>
+                        @empty
+                            <p class="text-muted text-center py-3">No activity yet</p>
+                        @endforelse
                     </div>
                 </div>
             </div>
@@ -283,6 +294,11 @@
     color: #d1d3e2;
 }
 
+.calendar-day.has-task {
+    cursor: pointer;
+    font-weight: 500;
+}
+
 /* Activity List */
 .activity-list {
     max-height: 300px;
@@ -315,14 +331,57 @@
 .activity-content {
     flex: 1;
 }
+
+/* Task List */
+.task-item {
+    padding: 8px 0;
+    border-bottom: 1px solid #e3e6f0;
+}
+
+.task-item:last-child {
+    border-bottom: none;
+}
+
+.task-item-title {
+    font-weight: 500;
+    color: #2e59d9;
+    margin-bottom: 3px;
+    font-size: 13px;
+}
+
+.task-item-time {
+    font-size: 11px;
+    color: #858796;
+}
 </style>
 @endpush
 
 @push('scripts')
 <script>
-const tasksData = {}; // bisa tambahkan nanti
+let tasksData = {}; // Menyimpan task data dari server
 const today = new Date();
-let currentDate = new Date(); // tambahin ini biar currentDate ke bulan & tahun sekarang
+let currentDate = new Date();
+
+// Fetch tasks saat page load
+async function fetchTasks() {
+    try {
+        console.log('Fetching tasks from: {{ route("peserta.upcoming-tasks") }}');
+        const response = await fetch('{{ route("peserta.upcoming-tasks") }}');
+        
+        if (!response.ok) {
+            console.error('Response error:', response.status, response.statusText);
+            renderCalendar();
+            return;
+        }
+        
+        tasksData = await response.json();
+        console.log('Tasks data received:', tasksData);
+        renderCalendar();
+    } catch (error) {
+        console.error('Error fetching tasks:', error);
+        renderCalendar();
+    }
+}
 
 function renderCalendar() {
     const year = currentDate.getFullYear();
@@ -362,6 +421,13 @@ function renderCalendar() {
             div.classList.add('today');
         }
 
+        // Cek apakah ada task di tanggal ini
+        const dateString = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        if (tasksData[dateString]) {
+            div.classList.add('has-task');
+            div.addEventListener('click', () => showTasksForDate(dateString, day, month, year));
+        }
+
         calendarBody.appendChild(div);
     }
 
@@ -386,9 +452,40 @@ function nextMonth() {
     renderCalendar();
 }
 
-document.addEventListener('DOMContentLoaded', renderCalendar);
-</script>
+function showTasksForDate(dateString, day, month, year) {
+    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
+                        'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const tasks = tasksData[dateString] || [];
+    
+    if (tasks.length === 0) return;
 
+    // Update selected date display
+    document.getElementById('selectedDate').textContent = `${day} ${monthNames[month]} ${year}`;
+    
+    // Build task list HTML
+    let taskListHtml = '';
+    tasks.forEach(task => {
+        taskListHtml += `
+            <div class="task-item">
+                <div class="task-item-title">${task.judul}</div>
+                <div class="task-item-time">
+                    <i class="fas fa-clock"></i> ${task.deadline}
+                </div>
+            </div>
+        `;
+    });
+    
+    document.getElementById('taskList').innerHTML = taskListHtml;
+    document.getElementById('taskTooltip').style.display = 'block';
+}
+
+function closeTaskTooltip() {
+    document.getElementById('taskTooltip').style.display = 'none';
+}
+
+// Initialize pada page load
+document.addEventListener('DOMContentLoaded', fetchTasks);
+</script>
 @endpush
 
 @endsection

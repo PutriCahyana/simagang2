@@ -47,4 +47,48 @@ class RoomController extends Controller
         // redirect balik ke halaman room dengan pesan sukses
         return redirect()->route('room')->with('success', 'Room berhasil ditambahkan!');
     }
+
+    public function edit($room_id)
+    {
+        $room = Room::where('room_id', $room_id)->firstOrFail();
+        
+        $data = array(
+            "judul" => "Edit Room",
+            "menuAdminRoom" => "active",
+            "room" => $room
+        );
+        
+        return view('admin/room/edit', $data);
+    }
+
+    public function update(Request $request, $room_id)
+    {
+        $room = Room::where('room_id', $room_id)->firstOrFail();
+        
+        // validasi input
+        $request->validate([
+            'nama_room' => 'required|string|max:100',
+            'deskripsi' => 'nullable|string',
+        ]);
+
+        // update data
+        $room->update([
+            'nama_room' => $request->nama_room,
+            'deskripsi' => $request->deskripsi,
+        ]);
+
+        // redirect balik dengan pesan sukses
+        return redirect()->route('room')->with('success', 'Room berhasil diupdate!');
+    }
+
+    public function destroy($room_id)
+{
+    $room = Room::where('room_id', $room_id)->firstOrFail();
+    
+    // Hapus room
+    $room->delete();
+    
+    // Redirect dengan pesan sukses
+    return redirect()->route('room')->with('success', 'Room berhasil dihapus!');
+}
 }

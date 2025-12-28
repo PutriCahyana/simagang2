@@ -18,4 +18,18 @@ class UserController extends Controller
         );
         return view('admin/user/index', $data);
     }
+
+    public function destroy($id)
+    {
+        try {
+            $user = User::findOrFail($id);
+            $user->delete();
+            
+            return redirect()->route('user')
+                ->with('success', 'Mentor berhasil dihapus');
+        } catch (\Exception $e) {
+            return redirect()->route('user')
+                ->with('error', 'Gagal menghapus mentor');
+        }
+    }
 }

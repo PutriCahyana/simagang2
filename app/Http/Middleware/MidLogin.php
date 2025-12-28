@@ -5,16 +5,11 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response;
 
 class MidLogin
 {
-    /**
-     * Handle an incoming request.
-     *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
-     * @param  string|null  ...$roles
-     */
     public function handle(Request $request, Closure $next, ...$roles): Response
     {
         // Cek apakah user sudah login
@@ -22,7 +17,7 @@ class MidLogin
             return redirect()->route('login')->with('error', 'Anda Belum Login');
         }
 
-        // Jika tidak ada role yang ditentukan, lanjutkan (akses untuk semua role yang login)
+        // Jika tidak ada role yang ditentukan, lanjutkan
         if (empty($roles)) {
             return $next($request);
         }
@@ -30,10 +25,28 @@ class MidLogin
         // Cek apakah role user sesuai dengan yang diizinkan
         $userRole = Auth::user()->role;
         
+        // 🔍 DEBUG LOG - PENTING!
+        Log::info('=== MIDDLEWARE CHECK ===');
+        Log::info('URL: ' . $request->url());
+        Log::info('User ID: ' . Auth::id());
+        Log::info('User Role: ' . $userRole);
+        Log::info('User Role Type: ' . gettype($userRole));
+        Log::info('User Role Length: ' . strlen($userRole));
+        Log::info('Required Roles: ' . json_encode($roles));
+        Log::info('Is Allowed: ' . (in_array($userRole, $roles) ? 'YES' : 'NO'));
+        
+        // Debug setiap role
+        foreach ($roles as $index => $role) {
+            Log::info("Role[$index]: '$role' (type: " . gettype($role) . ", length: " . strlen($role) . ")");
+            Log::info("Match with userRole: " . ($userRole === $role ? 'YES' : 'NO'));
+        }
+        
         if (!in_array($userRole, $roles)) {
-            return redirect()->route('dashboard')->with('error', 'Anda tidak memiliki akses ke halaman ini');
+            Log::error('ACCESS DENIED!');
+            abort(403, 'Anda tidak memiliki akses ke halaman ini');
         }
 
+        Log::info('ACCESS GRANTED!');
         return $next($request);
     }
 }

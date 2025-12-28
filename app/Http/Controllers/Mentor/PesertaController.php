@@ -3,72 +3,65 @@
 namespace App\Http\Controllers\Mentor;
 
 use App\Http\Controllers\Controller;
-
-use App\Models\Peserta;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class PesertaController extends Controller
 {
-    //Read : ambil semua peserta
     public function index()
     {
-        return Peserta::all();
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        $request->validate([
-            'nama' => 'required',
-            'nim' => 'required',
-            'kampus' => 'required',
-            'jurusan' => 'required',                                                                                                                                                                                                                                                                                        
+        $mentor = Auth::user();
+        
+        // Ambil semua room yang di-MANAGE oleh mentor ini
+        $rooms = $mentor->managedRooms()->get();
+        
+        // Ambil semua peserta dari room-room tersebut
+        $pesertaCollection = collect();
+        
+        foreach ($rooms as $room) {
+            $pesertaFromRoom = $room->peserta()
+                ->with(['peserta', 'joinedRooms'])
+                ->get()
+                ->map(function ($user) use ($room) {
+                    $user->current_room = $room;
+                    return $user;
+                });
+            
+            $pesertaCollection = $pesertaCollection->merge($pesertaFromRoom);
+        }
+        
+        // Grup peserta berdasarkan user_id
+        $pesertaGrouped = $pesertaCollection->groupBy('id')->map(function ($items) {
+            $firstItem = $items->first();
+            $firstItem->all_rooms = $items->pluck('current_room')->unique('room_id');
+            return $firstItem;
+        })->values();
+        
+        return view('mentor.peserta.index', [
+            'pesertaList' => $pesertaGrouped,
+            'totalPeserta' => $pesertaGrouped->count(),
+            'totalRooms' => $rooms->count(),
+            'allRooms' => $rooms // ← TAMBAH INI untuk kirim semua room mentor
         ]);
-
-        return Peserta::create($request->all());
     }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        return Peserta::findOrFail($id);
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        $peserta = Peserta::findOrFail($id);
-        $peserta->update($request->all());
-        return $peserta;
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        return Peserta::destroy($id);
-    }
+    
+    public function show($id)
+{
+    $mentor = Auth::user();
+    
+    // Ambil room_id yang di-manage oleh mentor
+    $roomIds = $mentor->managedRooms()->pluck('room_id');
+    
+    $peserta = \App\Models\User::whereHas('joinedRooms', function ($query) use ($roomIds) {
+            $query->whereIn('room.room_id', $roomIds); // ← TAMBAH: 'room.' untuk spesifik tabel room
+        })
+        ->where('id', $id)
+        ->where('role', 'peserta')
+        ->with(['peserta', 'joinedRooms'])
+        ->firstOrFail();
+    
+    return view('mentor.peserta.show', [
+        'peserta' => $peserta
+    ]);
+}
 }
