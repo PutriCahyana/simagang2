@@ -9,7 +9,7 @@
 <div class="card shadow mb-4">
     <div class="card-header py-3 d-flex justify-content-between align-items-center">
         <h6 class="m-0 font-weight-bold text-primary">Daftar Room</h6>
-        <a href="{{ route('mentor.roomCreate') }}" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#addRoomModal">
+        <a href="#" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addRoomModal">
             <i class="fas fa-plus mr-2"></i>
             Add Room
         </a>
@@ -95,7 +95,7 @@
             <i class="fas fa-inbox fa-4x text-gray-300 mb-3"></i>
             <h5 class="text-gray-600">Belum ada data room</h5>
             <p class="text-gray-500 mb-4">Klik tombol "Add Room" untuk membuat room baru</p>
-            <a href="{{ route('mentor.roomCreate') }}" class="btn btn-primary" data-toggle="modal" data-target="#addRoomModal">
+            <a href="{{ route('mentor.roomCreate') }}" class="btn btn-primary" data-bs-toggle="modal" data-target="#addRoomModal">
                 <i class="fas fa-plus mr-2"></i>
                 Buat Room Pertama
             </a>

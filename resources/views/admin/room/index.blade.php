@@ -8,9 +8,10 @@
     <div class="card">
         <div class="card-header d-flex flex-wrap b">
             {{-- ini nanti dihapus --}}
-            <a href="{{ route('roomCreate') }}" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#addRoomModal">
+            <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addRoomModal">
                 <i class="fas fa-plus mr-2"></i>
-                Add Room</a>
+                Add Room
+            </button>
                 
                 <!-- Include modal create -->
                 @include('admin.room.create')
@@ -62,8 +63,8 @@
                     </a>
                     <button type="button" 
                             class="btn btn-warning btn-sm" 
-                            data-toggle="modal" 
-                            data-target="#editRoomModal"
+                            data-bs-toggle="modal" 
+                            data-bs-target="#editRoomModal"
                             data-id="{{ $room->room_id }}" 
                             data-nama="{{ $room->nama_room }}" 
                             data-deskripsi="{{ $room->deskripsi ?? '' }}"
